@@ -80,6 +80,7 @@
 #define MODBUS_DEFAULT_DEVICE_ADDRESS   0x05
 
 #include <stdint.h>
+#include "fcode_common.h"
 
 /**
  * @name Modbus Configuration Containers
@@ -99,16 +100,70 @@ extern const uint8_t ucdm_modbus_base_address;
 /**@}*/ 
 
 /**
+ * @name Modbus State Machine State Variable States
+ */
+/**@{*/ 
+#define MODBUS_ST_PREINIT       0
+#define MODBUS_ST_IDLE          1
+#define MODBUS_ST_RECV          2
+#define MODBUS_ST_VERIFY        3
+#define MODBUS_ST_PROCESS       4
+#define MODBUS_ST_SEND          5
+/**@}*/ 
+
+/**
+ * @name Modbus State Machine Silence States
+ */
+/**@{*/ 
+#define MODBUS_OUT_NORMAL       0
+#define MODBUS_OUT_SILENT       1
+/**@}*/ 
+
+/**
+ * @name Modbus Current Transaction Types
+ */
+/**@{*/ 
+#define MODBUS_CTT_UNICAST      0
+#define MODBUS_CTT_BROADCAST    1
+/**@}*/ 
+
+
+/**
  * @name Modbus Internal Containers
  * 
  */
 /**@{*/ 
 
-extern uint8_t modbus_sm_state;
-extern uint8_t modbus_sm_rxlen;
+typedef struct MODBUS_ADUFORMAT_t
+{
+    const uint8_t prefix_n;
+    const uint8_t padding_n;
+    void (*const pack)(void);
+    uint8_t (*const validate)(void);
+    uint8_t (*const write)(void);
+}modbus_aduformat_t;
 
-extern uint8_t modbus_rxbuf[MODBUS_ADU_MAXLEN];
-extern uint8_t modbus_txbuf[MODBUS_ADU_MAXLEN];
+typedef struct MODBUS_SM_t
+{
+    const modbus_aduformat_t * aduformat;
+    uint8_t state;
+    uint8_t silent;
+    uint8_t rxtxlen;
+    uint8_t const* rxtxbuf;
+}modbus_sm_t;
+
+typedef struct MODBUS_CTRANS_t
+{
+    uint8_t broadcast;
+    uint8_t fcode;
+    const modbus_fcode_handler_t * fcode_handler;
+}modbus_ctrans_t;
+
+extern modbus_sm_t modbus_sm;
+extern modbus_ctrans_t modbus_ctrans;
+extern const modbus_aduformat_t modbus_aduformat;
+
+extern uint8_t modbus_rxtxbuf[MODBUS_ADU_MAXLEN];
 
 /**@}*/ 
 
@@ -172,7 +227,7 @@ extern uint8_t modbus_if_unhandled_rxb(void);
 extern uint8_t modbus_if_getc(void);
 extern uint8_t modbus_if_read(void *buffer, uint8_t len);
 
-extern uint8_t modbus_if_available_wrb(void);
+extern uint8_t modbus_if_reqlock(uint8_t len);
 extern uint8_t modbus_if_putc(uint8_t byte);
 extern uint8_t modbus_if_write(void *buffer, uint8_t len);
 /**@}*/ 
@@ -184,43 +239,26 @@ extern uint8_t modbus_if_write(void *buffer, uint8_t len);
 /**@{*/ 
 
 /**
-  * \brief MODBUS Layer 2/3 Helper function to determine command length
-  * 
-  * This function accepts a pointer to the start of the PDU thus far recieved, and 
-  * returns the number of additional bytes that need to be read in. If the data thus far
-  * is insufficient to determine full command length, then the number of bytes that are 
-  * required to make that determination is returned. This function should be called 
-  * repeatedly with increasing length of the command available until it returns 0, 
-  * indicating that the command is completely recieved.
-  * 
-  * @param *cmd Pointer to the modbus command rx buffer with the partial command. This
-  *             should point to the first byte of the ADU, ie, the address byte.
-  * @param len Number of bytes already available.
-  */
-uint8_t modbus_get_res_clen(uint8_t * cmd, uint8_t len);
-
-/**
   * \brief MODBUS Layer 2/3 Helper function to validate the recieved message
   * 
-  * This function accepts a pointer to the start of the PDU and the length of 
-  * the message. It confirms the CRC, confirms the address is relevant to this 
-  * slave. It returns 1 for a valid message and 0 for an invalid one. This 
-  * function also increments the appropriate counters.
+  * This function validates the message currently in the modbus_rxbuf. It 
+  * verifies the CRC, confirms the address is relevant to this slave. 
+  * It returns 1 for a valid message and 0 for an invalid one. This 
+  * function also increments the appropriate counters. 
+  * 
+  * The command length is not validated here, and should be previously
+  * verified using the crlen handlers.
   * 
   * If layer 2/3 gets a zero from here, it should discard the packet. If it 
   * recieves 1, it should then call modbus_process_command() so that the 
   * library can handle the message.
-  * 
-  * @param *cmd Pointer to the modbus command rx buffer with the full command. 
-  *             This should point to the first byte of the ADU, ie, the address byte.
-  * @param len Number of bytes already available.
   */
-uint8_t modbus_validate_message(uint8_t * cmd, uint8_t len, uint16_t crc);
+uint8_t modbus_uart_adu_validate(void);
 
 /**
   * \brief MODBUS Layer 2/3 Helper function to calculate the CRC
   * 
-  * This function accepts a pointer to the start of the PDU and the length of 
+  * This function accepts a pointer to the start of the ADU and the length of 
   * the message. It returns a MODBUS compatible CRC value. 
   * 
   * This function is provided as an independent, portable CRC generator which 
@@ -233,6 +271,9 @@ uint8_t modbus_validate_message(uint8_t * cmd, uint8_t len, uint16_t crc);
   * @param len Number of bytes already available.
   */
 uint16_t modbus_calculate_crc(uint8_t * cmd, uint8_t len);
+
+void modbus_uart_adu_pack(void);
+uint8_t modbus_uart_adu_write(void);
 
 /**@}*/ 
 

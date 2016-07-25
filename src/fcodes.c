@@ -29,59 +29,108 @@
  * @see fcodes.h
  */
 
+#include "fcodes.h"
 #include "modbus.h"
 #include "diagnostics.h"
-#include "fcodes.h"
 
-/**
- * @name Per Command Function Code Handler Implementations
- */
-/**@{*/ 
-
-void modbus_handler_notimpl(void);
-uint8_t modbus_crlen_notimpl(void);
-uint8_t modbus_validator_notimpl(void);
-
-void modbus_handler_notimpl(void){
-    ;   
-}
-
-uint8_t modbus_crlen_notimpl(void){
-    return -1;
-}
-
-uint8_t modbus_validator_notimpl(void){
-    return 1;
-}
+#include "fcode_bits.h"
+#include "fcode_regs.h"
 
 
-static const modbus_fcode_handler_t _rdcoils_handler = {
-    MB_FC_RD_COILS,
+const modbus_fcode_handler_t _rdexcst_handler = {
+    MB_FC_RD_EXCST,
+    &modbus_handler_notimpl,
+    &modbus_crlen_1b,
+    &modbus_validator_notimpl,
+};
+
+const modbus_fcode_handler_t _diagnostics_handler = {
+    MB_FC_DIAGNOSTICS,
     &modbus_handler_notimpl,
     &modbus_crlen_notimpl,
     &modbus_validator_notimpl,
 };
 
-static const modbus_fcode_handler_t _rdinputs_handler = {
-    MB_FC_RD_INPUTS,
+const modbus_fcode_handler_t _gtcecnt_handler = {
+    MB_FC_GT_CECNT,
     &modbus_handler_notimpl,
     &modbus_crlen_notimpl,
     &modbus_validator_notimpl,
 };
-/**@}*/ 
 
+const modbus_fcode_handler_t _gtcelog_handler = {
+    MB_FC_GT_CELOG,
+    &modbus_handler_notimpl,
+    &modbus_crlen_notimpl,
+    &modbus_validator_notimpl,
+};
+
+const modbus_fcode_handler_t _repsid_handler = {
+    MB_FC_REP_SID,
+    &modbus_handler_notimpl,
+    &modbus_crlen_notimpl,
+    &modbus_validator_notimpl,
+};
+
+const modbus_fcode_handler_t _rdfrec_handler = {
+    MB_FC_RD_FREC,
+    &modbus_handler_notimpl,
+    &modbus_crlen_notimpl,
+    &modbus_validator_notimpl,
+};
+
+const modbus_fcode_handler_t _wrfrec_handler = {
+    MB_FC_WR_FREC,
+    &modbus_handler_notimpl,
+    &modbus_crlen_notimpl,
+    &modbus_validator_notimpl,
+};
+
+const modbus_fcode_handler_t _rdfifoq_handler = {
+    MB_FC_RD_FIFOQ,
+    &modbus_handler_notimpl,
+    &modbus_crlen_notimpl,
+    &modbus_validator_notimpl,
+};
+
+const modbus_fcode_handler_t _eit_handler = {
+    MB_FC_EIT,
+    &modbus_handler_notimpl,
+    &modbus_crlen_notimpl,
+    &modbus_validator_notimpl,
+};
 
 /**
  * @name Modbus Function Code Dispatch
  */
 /**@{*/ 
 /**
- * \brief Supported Modbus Function Codes and Handler Addresses
+ * \brief Recognized Modbus Function Codes and Handler Addresses
+ * 
+ * TODO Consider replacing with a proper binary search tree?
  * 
  */
 static const modbus_fcode_handler_t *modbus_fcode_handlers[]={
+    &_unimpl_handler,
     &_rdcoils_handler,
-    &_rdinputs_handler
+    &_rdinputs_handler,
+    &_rdhreg_handler,
+    &_rdireg_handler,
+    &_wrscoil_handler,
+    &_wrsreg_handler,
+    &_rdexcst_handler,
+    &_diagnostics_handler,
+    &_gtcecnt_handler,
+    &_gtcelog_handler,
+    &_wrmcoils_handler,
+    &_wrmregs_handler,
+    &_repsid_handler,
+    &_rdfrec_handler,
+    &_wrfrec_handler,
+    &_wrregm_handler,
+    &_rwmregs_handler,
+    &_rdfifoq_handler,
+    &_eit_handler,
 };
 
 
@@ -92,6 +141,26 @@ static inline uint8_t _modbus_num_fcodes(void){
 }
 
 const modbus_fcode_handler_t* modbus_get_fcode_handler(uint8_t fcode){
+    uint8_t low = 0;
+    uint8_t high = _modbus_num_fcodes() - 1;
+    uint8_t middle;
+    
+    // TODO Figure out of the setup overhead actually makes this _less_ efficient 
+    // than a naive linear search.
+    
+    while(low <= high){
+        middle = (low + high) / 2;
+        if (modbus_fcode_handlers[middle]->fcode == fcode){
+            return modbus_fcode_handlers[middle];
+        }
+        else if (modbus_fcode_handlers[middle]->fcode > fcode){
+            high = middle - 1;
+        }
+        else{
+            low = middle + 1;
+        }
+    }
+    
     return modbus_fcode_handlers[0];
 }
 /**@}*/ 

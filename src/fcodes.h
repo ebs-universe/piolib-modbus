@@ -32,6 +32,7 @@
 #define MODBUS_FCODES_H
 
 #include <stdint.h>
+#include "fcode_common.h"
 
 /**
  * @name Modbus Function Codes
@@ -84,14 +85,6 @@
  * 
  */
 /**@{*/ 
-
-typedef struct {
-    uint8_t fcode;
-    void (*handler)(void);
-    uint8_t (*crlen)(void);
-    uint8_t (*validator)(void);
-} modbus_fcode_handler_t;
-
 const modbus_fcode_handler_t* modbus_get_fcode_handler(uint8_t fcode);
 /**@}*/ 
 

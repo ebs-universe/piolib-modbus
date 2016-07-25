@@ -36,39 +36,29 @@
 #include "fcodes.h"
 #include "diagnostics.h"
 
-/**
- * @name Modbus State Machine State Variable States
- */
-/**@{*/ 
-#define MODBUS_ST_IDLE          0
-#define MODBUS_ST_RECV          1
-#define MODBUS_ST_VERIFY        2
-#define MODBUS_ST_PROCESS       3
-#define MODBUS_ST_SEND          4
-/**@}*/ 
+modbus_ctrans_t modbus_ctrans;
 
-/**
- * \brief Modbus State Machine State Variable
- * 
- * Current state of the Modbus Interface State Machine.
- * Can be one of the following : 
- *  - MODBUS_ST_IDLE    0
- *  - MODBUS_ST_RECV    1
- *  - MODBUS_ST_VERIFY  2
- *  - MODBUS_ST_PROCESS 3
- *  - MODBUS_ST_SEND    4
- */
-uint8_t modbus_sm_state;
-uint8_t modbus_sm_rxlen;
+const modbus_aduformat_t modbus_aduformat = {
+    1, 
+    3,
+    &modbus_uart_adu_pack,
+    &modbus_uart_adu_validate,
+    &modbus_uart_adu_write,
+};
 
-uint8_t modbus_rxbuf[MODBUS_ADU_MAXLEN];
-uint8_t modbus_txbuf[MODBUS_ADU_MAXLEN];
+uint8_t modbus_rxtxbuf[MODBUS_ADU_MAXLEN];
 
-
+modbus_sm_t modbus_sm = {
+    &modbus_aduformat,
+    MODBUS_ST_PREINIT,
+    MODBUS_OUT_NORMAL,
+    0,
+    &modbus_rxtxbuf[0],
+};
 
 void modbus_reset_sm(void){
-    modbus_sm_state = MODBUS_ST_IDLE;
-    modbus_sm_rxlen = 0;
+    modbus_sm.rxtxlen = 0;
+    modbus_sm.state = MODBUS_ST_IDLE;
 }
 
 void modbus_reset_all(void){
@@ -91,31 +81,71 @@ void modbus_init(void){
 
 
 // MODBUS State Machine Implementation
-
 void modbus_state_machine(void){
     // This function can be moved to the application layer and reimplemented there
     // if it is desireable to better integrate the hardware driver layers with the 
     // modbus state machine. If this is to be done, copy out this function into the 
     // application layer, rename it, make the necessary changes, and call that new 
-    // functioninstead of this one. Most variables and containers used here should 
+    // function instead of this one. Most variables and containers used here should 
     // be usable as is from the application layer, as long as only one of the state 
     // machines is used consistently within the application.
-    if (modbus_sm_state == MODBUS_ST_IDLE){
-        ;
+    uint8_t tvar8;
+    switch(modbus_sm.state){
+        case MODBUS_ST_PREINIT:
+            break;
+        case MODBUS_ST_IDLE:
+            tvar8 = modbus_sm.aduformat->prefix_n + 1;
+            if (modbus_if_unhandled_rxb() >= tvar8){
+                modbus_if_read(&(modbus_rxtxbuf[0]), tvar8);
+                modbus_ctrans.fcode = modbus_rxtxbuf[tvar8-1];
+                modbus_ctrans.fcode_handler = modbus_get_fcode_handler(modbus_ctrans.fcode);
+                modbus_sm.rxtxlen = tvar8;
+                modbus_sm.state = MODBUS_ST_RECV;
+            };
+            break;
+        case MODBUS_ST_RECV:
+            tvar8 = modbus_ctrans.fcode_handler->crlen();
+            if (tvar8){
+                if (modbus_if_unhandled_rxb() >= tvar8){
+                    modbus_if_read(&(modbus_rxtxbuf[modbus_sm.rxtxlen]), tvar8);
+                    modbus_sm.rxtxlen += tvar8;
+                }
+            }
+            else{
+                modbus_sm.state = MODBUS_ST_VERIFY;
+            }
+            break;
+        case MODBUS_ST_VERIFY:
+            if (modbus_sm.aduformat->validate()){
+                modbus_sm.state = MODBUS_ST_PROCESS;
+            }
+            else{
+                // Send back exception?
+                modbus_reset_sm();
+            }
+            break;
+        case MODBUS_ST_PROCESS:
+            modbus_process_command();
+            if (modbus_sm.rxtxlen){
+                modbus_sm.state = MODBUS_ST_SEND;
+            }
+            else{
+                modbus_reset_sm();
+            }
+            break;
+        case MODBUS_ST_SEND:
+            if (modbus_sm.aduformat->write()){
+                modbus_reset_sm();
+            }
+            break;
     }
+    
 }
 
 uint8_t modbus_process_command(void){
-//     if (failure){
-//         correct_cnt++;
-//         return 0;
-//     }
+    modbus_ctrans.fcode_handler->handler();
     modbus_server_msg_cnt ++;
     return 1;
-}
-
-uint8_t modbus_get_res_clen(uint8_t * cmd, uint8_t len){
-    return 0;
 }
 
 uint16_t modbus_calculate_crc(uint8_t * cmd, uint8_t len)
@@ -139,12 +169,13 @@ uint16_t modbus_calculate_crc(uint8_t * cmd, uint8_t len)
   return crc;  
 }
 
-uint8_t modbus_validate_message(uint8_t * cmd, uint8_t len, uint16_t crc){
+uint8_t modbus_uart_adu_validate(void){
     //Get Address included in message
-    uint8_t apu_addr = *cmd;
-    
+    uint8_t apu_addr = modbus_rxtxbuf[0];
     //Get CRC included in message
-    uint16_t apu_crc = (uint16_t)(*(cmd + len - 2)) + ((uint16_t)(*(cmd + len - 1))<<8);
+    uint16_t apu_crc = (modbus_rxtxbuf[modbus_sm.rxtxlen-2]) | ((uint16_t)(modbus_rxtxbuf[modbus_sm.rxtxlen-1])<<8);
+    // Calculate CRC of message
+    uint16_t crc = modbus_calculate_crc(&(modbus_rxtxbuf[0]), (modbus_sm.rxtxlen-2));
     
     if (apu_crc != crc){
         modbus_bus_comm_err_cnt ++;
@@ -153,9 +184,32 @@ uint8_t modbus_validate_message(uint8_t * cmd, uint8_t len, uint16_t crc){
     
     modbus_bus_msg_cnt ++;
     
-    if (apu_addr == ucdm_register[UCDM_MODBUS_DEVICE_ADDRESS]){
-        return 1;
+    if (!apu_addr){
+        modbus_ctrans.broadcast = MODBUS_CTT_BROADCAST;
+    }
+    else if(apu_addr == ucdm_register[UCDM_MODBUS_DEVICE_ADDRESS]){
+        modbus_ctrans.broadcast = MODBUS_CTT_UNICAST;
+    }
+    else{
+        return 0;
     }
     
+    return 1;
+}
+
+void modbus_uart_adu_pack(void){
+    uint16_t crc;
+    crc = modbus_calculate_crc(&modbus_rxtxbuf[0], 
+                               modbus_sm.rxtxlen);
+    modbus_rxtxbuf[modbus_sm.rxtxlen] = (uint8_t)crc;
+    modbus_rxtxbuf[modbus_sm.rxtxlen+1] = (uint8_t)(crc >> 8);
+    modbus_sm.rxtxlen += 2;
+}
+
+uint8_t modbus_uart_adu_write(void){
+    if (modbus_if_reqlock(modbus_sm.rxtxlen)){
+        modbus_if_write(&(modbus_rxtxbuf[0]), modbus_sm.rxtxlen);
+        return 1;
+    }
     return 0;
 }
