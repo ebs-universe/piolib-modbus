@@ -20,84 +20,87 @@
 */
 
 /**
- * @file fcode_rdbits.c
- * @brief Read Coils and Inputs (Bit Read) Function Code Handler Implementations.
+ * @file fcode_special.c
+ * @brief Special Function Code Handler Implementations.
  */
 
 #include <ucdm/ucdm.h>
 
 #include "modbus.h"
-#include "diagnostics.h"
 #include "fcodes.h"
-#include "fcode_bits.h"
+#include "fcode_special.h"
 
-
-void modbus_handler_rdbits(void)
+void modbus_handler_repsid(void)
 {
     modbus_handler_notimpl();
 }
 
-void modbus_handler_wrsbit(void)
-{
-    uint16_t addrb = MODBUS_RWORD(1, 2) - 1;
-    uint8_t val = MODBUS_RBYTE(3);
-    uint8_t res;
-    
-    if (val){
-        res = ucdm_set_bit(addrb);
-    }
-    else{
-        res = ucdm_clear_bit(addrb);
-    }
-    if (res){
-        modbus_build_exc_response(0x02);
-        return;
-    }
-    return;
-}
-
-void modbus_handler_wrbits(void)
+void modbus_handler_rdfrec(void)
 {
     modbus_handler_notimpl();
 }
 
-const modbus_fcode_handler_t _rdcoils_handler = {
-    MB_FC_RD_COILS,
-    5, 0,
-    #if MB_SUPPORT_FC_RD_COILS
-        &modbus_handler_rdbits,
+void modbus_handler_wrfrec(void)
+{
+    modbus_handler_notimpl();
+}
+
+void modbus_handler_fifoq(void)
+{
+    modbus_handler_notimpl();
+}
+
+void modbus_handler_eit(void)
+{
+    modbus_handler_notimpl();
+}
+
+const modbus_fcode_handler_t _repsid_handler = {
+    MB_FC_REP_SID,
+    1, 0,
+    #if MB_SUPPORT_FC_REP_SID
+        &modbus_handler_repsid,
     #else
         &modbus_handler_notimpl,
     #endif
 };
 
-const modbus_fcode_handler_t _rdinputs_handler = {
-    MB_FC_RD_INPUTS,
-    5, 0,
-    #if MB_SUPPORT_FC_RD_INPUTS
-        &modbus_handler_rdbits,
+const modbus_fcode_handler_t _rdfrec_handler = {
+    MB_FC_RD_FREC,
+    2, 1,
+    #if MB_SUPPORT_FC_RD_FREC
+        &modbus_handler_rdfrec,
     #else
         &modbus_handler_notimpl,
     #endif
 };
 
-const modbus_fcode_handler_t _wrscoil_handler = {
-    MB_FC_WR_SCOIL,
-    5, 0,
-    #if MB_SUPPORT_FC_WR_SCOIL
-        &modbus_handler_wrsbit,
+const modbus_fcode_handler_t _wrfrec_handler = {
+    MB_FC_WR_FREC,
+    2, 1,
+    #if MB_SUPPORT_FC_WR_FREC
+        &modbus_handler_wrfrec,
     #else
         &modbus_handler_notimpl,
     #endif
 };
 
-const modbus_fcode_handler_t _wrmcoils_handler = {
-    MB_FC_WR_MCOILS,
+const modbus_fcode_handler_t _rdfifoq_handler = {
+    MB_FC_RD_FIFOQ,
+    3, 0,
+    #if MB_SUPPORT_FC_RD_FIFOQ
+        &modbus_handler_fifoq,
+    #else
+        &modbus_handler_notimpl,
+    #endif
+};
+
+const modbus_fcode_handler_t _eit_handler = {
+    MB_FC_EIT,
     0, 0,
-    #if MB_SUPPORT_FC_WR_MCOILS
-        &modbus_handler_wrbits,
+    #if MB_SUPPORT_FC_EIT
+        &modbus_handler_eit,
     #else
         &modbus_handler_notimpl,
     #endif
 };
-

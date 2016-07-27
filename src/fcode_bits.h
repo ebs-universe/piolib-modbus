@@ -29,7 +29,7 @@
 #define MODBUS_FCODE_BITS_H
 
 #include <stdint.h>
-#include "fcode_common.h"
+#include "fcodes_common.h"
 
 void modbus_handler_rdbits(void);
 void modbus_handler_wrsbit(void);
@@ -39,7 +39,5 @@ extern const modbus_fcode_handler_t _rdcoils_handler;
 extern const modbus_fcode_handler_t _rdinputs_handler;
 extern const modbus_fcode_handler_t _wrscoil_handler;
 extern const modbus_fcode_handler_t _wrmcoils_handler;
-
-/**@}*/ 
 
 #endif

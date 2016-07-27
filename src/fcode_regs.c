@@ -24,13 +24,17 @@
  * @brief Read Holding and Input Register (Register Read) Function Code Handler Implementations.
  */
 
-#include <string.h>
 #include <ucdm/ucdm.h>
 
 #include "modbus.h"
 #include "diagnostics.h"
 #include "fcodes.h"
 #include "fcode_regs.h"
+
+// TODO
+// It _may_ be possible to refactor these functions to reduce code duplication
+// and reduce overall code foofprint. This will, however, deepen the worst case 
+// call stack.
 
 // NOTE 
 // UCDM expects uint8_t register addresses. Leave that cast to the very 
@@ -49,8 +53,7 @@ void modbus_handler_rdregs(void)
         return;
     }
     
-    if (modbus_ctrans.broadcast || modbus_sm.silent){
-        modbus_sm.rxtxlen = 0;
+    if (modbus_ctrans.broadcast){
         return;
     }
     
@@ -75,10 +78,7 @@ void modbus_handler_wrsreg(void)
         modbus_build_exc_response(0x02);
         return;
     }
-    if (modbus_ctrans.broadcast || modbus_sm.silent){
-        modbus_sm.rxtxlen = 0;
-        return;   
-    }
+    return;
 }
 
 void modbus_handler_wrregs(void)
@@ -91,7 +91,7 @@ void modbus_handler_wrregs(void)
     
     if (saddr + n >= DMAP_MAXREGS){    
         // WARNING If some / all of the registers are not writeable, 
-        // an exception is not returned.   
+        // an exception is not returned.
         modbus_build_exc_response(0x02);
         return;
     }
@@ -105,8 +105,7 @@ void modbus_handler_wrregs(void)
         scount += ucdm_set_register((uint8_t)(saddr + i), tvar);
     }
     
-    if (modbus_ctrans.broadcast || modbus_sm.silent){
-        modbus_sm.rxtxlen = 0;
+    if (modbus_ctrans.broadcast){
         return;   
     }
     modbus_sm.rxtxlen = modbus_sm.aduformat->prefix_n + 5;
@@ -136,59 +135,106 @@ void modbus_handler_wrregm(void)
         modbus_build_exc_response(0x02);
         return;
     }
-    
-    if (modbus_ctrans.broadcast || modbus_sm.silent){
-        modbus_sm.rxtxlen = 0;
-        return;   
-    }
-    
     return;
 }
 
 void modbus_handler_rwmregs(void)
 {
-    modbus_handler_notimpl();
+    uint8_t nr = MODBUS_RBYTE(4);
+    uint16_t rsaddr = MODBUS_RWORD(1, 2) - 1;
+    uint8_t nw = MODBUS_RBYTE(8);
+    uint16_t wsaddr = MODBUS_RWORD(5, 6) - 1;
+    uint8_t * ap;
+    uint16_t tvar;
+    
+    if ((rsaddr + nr > DMAP_MAXREGS) || (wsaddr + nr > DMAP_MAXREGS)){
+        modbus_build_exc_response(0x02);
+        return;
+    }
+    
+    ap = &MODBUS_RBYTE(10);
+       
+    for(uint8_t i=0; i<=nw; i++){
+        tvar = (uint16_t)(*(ap++));
+        tvar = tvar << 8;
+        tvar |= *(ap++);
+        ucdm_set_register((uint8_t)(wsaddr + i), tvar);
+    }
+    
+    if (modbus_ctrans.broadcast){
+        return;   
+    }
+    
+    ap = &MODBUS_RBYTE(1);
+    *(ap++) = 2 * nr;
+       
+    for(uint8_t i=0; i<=nr; i++){
+        tvar = ucdm_get_register(rsaddr + i);
+        *(ap++) = (uint8_t)(tvar >> 8);
+        *(ap++) = (uint8_t)(tvar);
+    }
+    
+    modbus_sm.rxtxlen = modbus_sm.aduformat->prefix_n + 2 + 2*nr;
+    modbus_sm.aduformat->pack();
+    return;
 }
 
 const modbus_fcode_handler_t _rdhreg_handler = {
     MB_FC_RD_HREG,
-    &modbus_handler_rdregs,
-    &modbus_crlen_5b,
-    &modbus_validator_notimpl,
+    5, 0,
+    #if MB_SUPPORT_FC_RD_HREG
+        &modbus_handler_rdregs,
+    #else
+        &modbus_handler_notimpl,
+    #endif
 };
 
 const modbus_fcode_handler_t _rdireg_handler = {
     MB_FC_RD_IREG,
-    &modbus_handler_rdregs,
-    &modbus_crlen_5b,
-    &modbus_validator_notimpl,
+    5, 0,
+    #if MB_SUPPORT_FC_RD_IREG
+        &modbus_handler_rdregs,
+    #else
+        &modbus_handler_notimpl,
+    #endif
 };
 
 const modbus_fcode_handler_t _wrsreg_handler = {
     MB_FC_WR_SREG,
-    &modbus_handler_wrsreg,
-    &modbus_crlen_5b,
-    &modbus_validator_notimpl,
+    5, 0,
+    #if MB_SUPPORT_FC_WR_SREG
+        &modbus_handler_wrsreg,
+    #else
+        &modbus_handler_notimpl,
+    #endif
 };
 
 const modbus_fcode_handler_t _wrmregs_handler = {
     MB_FC_WR_MREGS,
-    &modbus_handler_wrregs,
-    &modbus_crlen_notimpl,
-    &modbus_validator_notimpl,
+    6, 5,
+    #if MB_SUPPORT_FC_WR_MREGS
+        &modbus_handler_wrregs,
+    #else
+        &modbus_handler_notimpl,
+    #endif
 };
 
 const modbus_fcode_handler_t _wrregm_handler = {
     MB_FC_WR_REGM,
-    &modbus_handler_wrregm,
-    &modbus_crlen_7b,
-    &modbus_validator_notimpl,
+    7, 0,
+    #if MB_SUPPORT_FC_WR_REGM
+        &modbus_handler_wrregm,
+    #else
+        &modbus_handler_notimpl,
+    #endif
 };
 
 const modbus_fcode_handler_t _rwmregs_handler = {
     MB_FC_RW_MREGS,
-    &modbus_handler_rwmregs,
-    &modbus_crlen_notimpl,
-    &modbus_validator_notimpl,
+    10, 9,
+    #if MB_SUPPORT_FC_RW_MREGS
+        &modbus_handler_rwmregs,
+    #else
+        &modbus_handler_notimpl,
+    #endif
 };
-

@@ -34,6 +34,7 @@
 
 #include "diagnostics.h"
 
+
 /**
  * @name Diagnostic Counters
  */
@@ -80,11 +81,11 @@ void modbus_clear_counters(void){
 void modbus_clear_diagnostics(void){
     modbus_clear_eventlog();
     modbus_clear_counters();
+    diagnostic_register = 0x0000;
 }
 
 void modbus_init_eventlog(void){
     bytebuf_vInit(modbus_comm_event_log_buf, 64, &modbus_comm_event_log);
-    modbus_comm_event_cnt = 0;
     modbus_clear_eventlog();
 }
 

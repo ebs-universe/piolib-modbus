@@ -32,7 +32,8 @@
 #define MODBUS_FCODES_H
 
 #include <stdint.h>
-#include "fcode_common.h"
+#include "fcodes_config.h"
+#include "fcodes_common.h"
 
 /**
  * @name Modbus Function Codes
@@ -68,7 +69,7 @@
     #define MB_SFC_DAIG_RETDIAGR      0x0002
     #define MB_SFC_DAIG_CHASCDELIM    0x0003
     #define MB_SFC_DAIG_FORCELISTEN   0x0004
-    #define MB_SFC_DAIG_CLRCNTS       0x0005
+    #define MB_SFC_DAIG_CLRCNTS       0x000A
     #define MB_SFC_DAIG_RETBMCNT      0x000B
     #define MB_SFC_DAIG_RETBCECNT     0x000C
     #define MB_SFC_DAIG_RETBEECNT     0x000D

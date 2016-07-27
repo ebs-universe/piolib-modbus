@@ -80,7 +80,7 @@
 #define MODBUS_DEFAULT_DEVICE_ADDRESS   0x05
 
 #include <stdint.h>
-#include "fcode_common.h"
+#include "fcodes_common.h"
 
 /**
  * @name Modbus Configuration Containers
@@ -137,7 +137,7 @@ extern const uint8_t ucdm_modbus_base_address;
 typedef struct MODBUS_ADUFORMAT_t
 {
     const uint8_t prefix_n;
-    const uint8_t padding_n;
+    const uint8_t postfix_n;
     void (*const pack)(void);
     uint8_t (*const validate)(void);
     uint8_t (*const write)(void);
@@ -162,7 +162,6 @@ typedef struct MODBUS_CTRANS_t
 extern modbus_sm_t modbus_sm;
 extern modbus_ctrans_t modbus_ctrans;
 extern const modbus_aduformat_t modbus_aduformat;
-
 extern uint8_t modbus_rxtxbuf[MODBUS_ADU_MAXLEN];
 
 /**@}*/ 
@@ -188,6 +187,7 @@ void modbus_reset_all(void);
 
 void modbus_state_machine(void);
 uint8_t modbus_process_command(void);
+extern uint16_t modbus_bus_char_overrun_cnt;
 
 /**@}*/ 
 

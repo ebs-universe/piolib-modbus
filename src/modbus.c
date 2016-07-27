@@ -40,7 +40,7 @@ modbus_ctrans_t modbus_ctrans;
 
 const modbus_aduformat_t modbus_aduformat = {
     1, 
-    3,
+    2,
     &modbus_uart_adu_pack,
     &modbus_uart_adu_validate,
     &modbus_uart_adu_write,
@@ -97,14 +97,14 @@ void modbus_state_machine(void){
             tvar8 = modbus_sm.aduformat->prefix_n + 1;
             if (modbus_if_unhandled_rxb() >= tvar8){
                 modbus_if_read(&(modbus_rxtxbuf[0]), tvar8);
+                modbus_sm.rxtxlen = tvar8;
                 modbus_ctrans.fcode = modbus_rxtxbuf[tvar8-1];
                 modbus_ctrans.fcode_handler = modbus_get_fcode_handler(modbus_ctrans.fcode);
-                modbus_sm.rxtxlen = tvar8;
                 modbus_sm.state = MODBUS_ST_RECV;
             };
             break;
         case MODBUS_ST_RECV:
-            tvar8 = modbus_ctrans.fcode_handler->crlen();
+            tvar8 = modbus_crlen();
             if (tvar8){
                 if (modbus_if_unhandled_rxb() >= tvar8){
                     modbus_if_read(&(modbus_rxtxbuf[modbus_sm.rxtxlen]), tvar8);
@@ -120,17 +120,18 @@ void modbus_state_machine(void){
                 modbus_sm.state = MODBUS_ST_PROCESS;
             }
             else{
-                // Send back exception?
+                // CRC Failed / Command not for us.
                 modbus_reset_sm();
             }
             break;
         case MODBUS_ST_PROCESS:
             modbus_process_command();
-            if (modbus_sm.rxtxlen){
-                modbus_sm.state = MODBUS_ST_SEND;
+            if (modbus_ctrans.broadcast || !(modbus_sm.rxtxlen)){
+                modbus_server_noresp_cnt ++;
+                modbus_reset_sm();
             }
             else{
-                modbus_reset_sm();
+                modbus_sm.state = MODBUS_ST_SEND;
             }
             break;
         case MODBUS_ST_SEND:
@@ -143,6 +144,10 @@ void modbus_state_machine(void){
 }
 
 uint8_t modbus_process_command(void){
+    if (modbus_sm.silent && (modbus_ctrans.fcode != MB_FC_DIAGNOSTICS)){
+        modbus_sm.rxtxlen = 0;
+        return 0;
+    }
     modbus_ctrans.fcode_handler->handler();
     modbus_server_msg_cnt ++;
     return 1;
@@ -194,6 +199,7 @@ uint8_t modbus_uart_adu_validate(void){
         return 0;
     }
     
+    modbus_server_msg_cnt ++;
     return 1;
 }
 

@@ -33,6 +33,10 @@
 
 #include<bytebuf/bytebuf.h>
 
+
+extern uint16_t diagnostic_register;
+extern uint8_t exception_status_register;
+
 /**
  * @name Diagnostic Counters
  */

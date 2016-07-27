@@ -20,31 +20,25 @@
 */
 
 /**
- * @file fcode_regs.h
- * @brief Holding and Input Register (Register Access) Function Code Handlers.
+ * @file fcode_control.h
+ * @brief Modbus Control and Diagnostics Function Code Handlers.
  */
 
 
-#ifndef MODBUS_FCODE_REGS_H
-#define MODBUS_FCODE_REGS_H
+#ifndef MODBUS_FCODE_CONTROL_H
+#define MODBUS_FCODE_CONTROL_H
 
 #include <stdint.h>
 #include "fcodes_common.h"
 
-void modbus_handler_rdregs(void);
-void modbus_handler_wrsreg(void);
-void modbus_handler_wrregs(void);
-void modbus_handler_wrregm(void);
-void modbus_handler_rwmregs(void);
+void modbus_handler_rdexcst(void);
+void modbus_handler_diagnostics(void);
+void modbus_handler_gtcecnt(void);
+void modbus_handler_gtcelog(void);
 
-uint8_t modbus_crlen_wrmregs(void);
-uint8_t modbus_crlen_rwmregs(void);
-
-extern const modbus_fcode_handler_t _rdhreg_handler;
-extern const modbus_fcode_handler_t _rdireg_handler;
-extern const modbus_fcode_handler_t _wrsreg_handler;
-extern const modbus_fcode_handler_t _wrmregs_handler;
-extern const modbus_fcode_handler_t _wrregm_handler;
-extern const modbus_fcode_handler_t _rwmregs_handler;
+extern const modbus_fcode_handler_t _rdexcst_handler;
+extern const modbus_fcode_handler_t _diagnostics_handler;
+extern const modbus_fcode_handler_t _gtcecnt_handler;
+extern const modbus_fcode_handler_t _gtcelog_handler;
 
 #endif

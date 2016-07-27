@@ -37,17 +37,13 @@
 
 typedef struct {
     const uint8_t fcode;
+    const uint8_t apriorilen;
+    const uint8_t addlen_idx;
     void (*const handler)(void);
-    uint8_t (*const crlen)(void);
-    uint8_t (*const validator)(void);
 } modbus_fcode_handler_t;
 
 void modbus_handler_notimpl(void);
-uint8_t modbus_crlen_notimpl(void);
-uint8_t modbus_crlen_5b(void);
-uint8_t modbus_crlen_1b(void);
-uint8_t modbus_crlen_7b(void);
-uint8_t modbus_validator_notimpl(void);
+uint8_t modbus_crlen(void);
 void modbus_build_exc_response(uint8_t ecode);
 
 extern const modbus_fcode_handler_t _unimpl_handler;

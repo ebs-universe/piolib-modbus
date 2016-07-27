@@ -32,41 +32,47 @@
 #include "modbus.h"
 #include "diagnostics.h"
 #include "fcodes.h"
-#include "fcode_common.h"
+#include "fcodes_common.h"
 
 
 void modbus_handler_notimpl(void){
-    modbus_rxtxbuf[modbus_sm.aduformat->prefix_n] +=  0x80;
-    modbus_rxtxbuf[modbus_sm.aduformat->prefix_n + 1] = 0x01;
-    modbus_sm.rxtxlen = modbus_sm.aduformat->prefix_n + 2;
-    modbus_sm.aduformat->pack();
+    modbus_build_exc_response(0x01);
     return;
 }
 
-uint8_t modbus_crlen_notimpl(void){
-    return 0;
-}
-
-uint8_t modbus_crlen_5b(void){
-    return modbus_sm.aduformat->padding_n + 5 - modbus_sm.rxtxlen;
-}
-
-uint8_t modbus_crlen_1b(void){
-    return modbus_sm.aduformat->padding_n + 1 - modbus_sm.rxtxlen;
-}
-
-uint8_t modbus_crlen_7b(void){
-    return modbus_sm.aduformat->padding_n + 7 - modbus_sm.rxtxlen;
-}
-
-uint8_t modbus_validator_notimpl(void){
-    return 1;
+uint8_t modbus_crlen(void){
+    uint8_t apriorilen = modbus_ctrans.fcode_handler->apriorilen;
+    uint8_t addllen;
+    if (!apriorilen){
+        return 0;
+    }
+    apriorilen += modbus_sm.aduformat->prefix_n;
+    if (modbus_sm.rxtxlen < apriorilen){
+        return(apriorilen - modbus_sm.rxtxlen);
+    }
+    else{
+        if (modbus_ctrans.fcode_handler->addlen_idx){
+            addllen = MODBUS_RBYTE(modbus_ctrans.fcode_handler->addlen_idx);
+            return(apriorilen + addllen + modbus_sm.aduformat->postfix_n - modbus_sm.rxtxlen);
+        }
+        else{
+            return(apriorilen + modbus_sm.aduformat->postfix_n - modbus_sm.rxtxlen);
+        }
+    }
 }
 
 void modbus_build_exc_response(uint8_t ecode){
-    if (modbus_ctrans.broadcast || modbus_sm.silent){
-        modbus_sm.rxtxlen = 0;
-        return;   
+    modbus_bus_exception_cnt ++;
+    if (modbus_ctrans.broadcast){
+        return;
+    }
+    switch(ecode){
+        case 0x07:
+            modbus_server_nak_cnt ++;
+            break;
+        case 0x06:
+            modbus_server_busy_cnt ++;
+            break;
     }
     modbus_rxtxbuf[modbus_sm.aduformat->prefix_n] += 0x80;
     modbus_rxtxbuf[modbus_sm.aduformat->prefix_n + 1] = ecode;
@@ -77,7 +83,6 @@ void modbus_build_exc_response(uint8_t ecode){
 
 const modbus_fcode_handler_t _unimpl_handler = {
     0x00,
+    0, 0,
     &modbus_handler_notimpl,
-    &modbus_crlen_notimpl,
-    &modbus_validator_notimpl,
 };

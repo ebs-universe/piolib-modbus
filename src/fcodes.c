@@ -35,70 +35,8 @@
 
 #include "fcode_bits.h"
 #include "fcode_regs.h"
-
-
-const modbus_fcode_handler_t _rdexcst_handler = {
-    MB_FC_RD_EXCST,
-    &modbus_handler_notimpl,
-    &modbus_crlen_1b,
-    &modbus_validator_notimpl,
-};
-
-const modbus_fcode_handler_t _diagnostics_handler = {
-    MB_FC_DIAGNOSTICS,
-    &modbus_handler_notimpl,
-    &modbus_crlen_notimpl,
-    &modbus_validator_notimpl,
-};
-
-const modbus_fcode_handler_t _gtcecnt_handler = {
-    MB_FC_GT_CECNT,
-    &modbus_handler_notimpl,
-    &modbus_crlen_notimpl,
-    &modbus_validator_notimpl,
-};
-
-const modbus_fcode_handler_t _gtcelog_handler = {
-    MB_FC_GT_CELOG,
-    &modbus_handler_notimpl,
-    &modbus_crlen_notimpl,
-    &modbus_validator_notimpl,
-};
-
-const modbus_fcode_handler_t _repsid_handler = {
-    MB_FC_REP_SID,
-    &modbus_handler_notimpl,
-    &modbus_crlen_notimpl,
-    &modbus_validator_notimpl,
-};
-
-const modbus_fcode_handler_t _rdfrec_handler = {
-    MB_FC_RD_FREC,
-    &modbus_handler_notimpl,
-    &modbus_crlen_notimpl,
-    &modbus_validator_notimpl,
-};
-
-const modbus_fcode_handler_t _wrfrec_handler = {
-    MB_FC_WR_FREC,
-    &modbus_handler_notimpl,
-    &modbus_crlen_notimpl,
-    &modbus_validator_notimpl,
-};
-
-const modbus_fcode_handler_t _rdfifoq_handler = {
-    MB_FC_RD_FIFOQ,
-    &modbus_handler_notimpl,
-    &modbus_crlen_notimpl,
-    &modbus_validator_notimpl,
-};
-
-const modbus_fcode_handler_t _eit_handler = {
-    MB_FC_EIT,
-    &modbus_handler_notimpl,
-    &modbus_crlen_notimpl,
-    &modbus_validator_notimpl,
-};
+#include "fcode_control.h"
+#include "fcode_special.h"
 
 /**
  * @name Modbus Function Code Dispatch
@@ -145,7 +83,7 @@ const modbus_fcode_handler_t* modbus_get_fcode_handler(uint8_t fcode){
     uint8_t high = _modbus_num_fcodes() - 1;
     uint8_t middle;
     
-    // TODO Figure out of the setup overhead actually makes this _less_ efficient 
+    // TODO Figure out if the setup overhead actually makes this _less_ efficient 
     // than a naive linear search.
     
     while(low <= high){
