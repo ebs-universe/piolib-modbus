@@ -22,20 +22,19 @@
 Docstring for modbus
 """
 
-
+import os
 import pytest
 import minimalmodbus
 
-
-SLAVE_ADDRESS = 5
-SLAVE_BAUDRATE = 256000
 SLAVE_NREGS = 200
 
 
 @pytest.fixture
-def instrument():
-    i = minimalmodbus.Instrument('/dev/ttyACM1', SLAVE_ADDRESS)
-    i.serial.baudrate = SLAVE_BAUDRATE
+def instrument(request):
+    port = os.path.join('/dev', request.config.getoption('--port'))
+    saddress = int(request.config.getoption('--saddress'))
+    i = minimalmodbus.Instrument(port, saddress)
+    i.serial.baudrate = int(request.config.getoption('--baud'))
     i.serial.timeout = 0.1
     i.debug = True
     return i

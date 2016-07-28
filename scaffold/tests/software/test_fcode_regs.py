@@ -1,13 +1,12 @@
 
 import pytest
 from modbus import instrument
-from modbus import SLAVE_ADDRESS
 from modbus import SLAVE_NREGS
 
 
 def test_modbus_rdregs_preliminary(instrument):
     rval = instrument.read_register(0)
-    assert rval == SLAVE_ADDRESS
+    assert rval == instrument.address
 
 
 def test_wrsreg_1b(instrument):
