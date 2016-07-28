@@ -39,7 +39,7 @@ void modbus_handler_rdbits(void)
 
 void modbus_handler_wrsbit(void)
 {
-    uint16_t addrb = MODBUS_RWORD(1, 2) - 1;
+    uint16_t addrb = MODBUS_RWORD(1, 2);
     uint8_t val = MODBUS_RBYTE(3);
     uint8_t res;
     

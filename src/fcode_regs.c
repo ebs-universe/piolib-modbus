@@ -44,7 +44,7 @@
 void modbus_handler_rdregs(void)
 {
     uint8_t n = MODBUS_RBYTE(4);
-    uint16_t saddr = MODBUS_RWORD(1, 2) - 1;
+    uint16_t saddr = MODBUS_RWORD(1, 2);
     uint16_t tvar;
     uint8_t * wp;
     
@@ -73,7 +73,7 @@ void modbus_handler_rdregs(void)
 
 void modbus_handler_wrsreg(void)
 {
-    uint8_t res = ucdm_set_register((uint8_t)(MODBUS_RWORD(1, 2) - 1), MODBUS_RWORD(3, 4));
+    uint8_t res = ucdm_set_register((uint8_t)(MODBUS_RWORD(1, 2)), MODBUS_RWORD(3, 4));
     if (res){
         modbus_build_exc_response(0x02);
         return;
@@ -84,10 +84,10 @@ void modbus_handler_wrsreg(void)
 void modbus_handler_wrregs(void)
 {
     uint8_t n = MODBUS_RBYTE(4);
-    uint16_t saddr = MODBUS_RWORD(1, 2) - 1;
+    uint16_t saddr = MODBUS_RWORD(1, 2);
     uint16_t tvar;
     uint8_t * rp;
-    uint8_t scount=0;
+    uint8_t ecount=0;
     
     if (saddr + n >= DMAP_MAXREGS){    
         // WARNING If some / all of the registers are not writeable, 
@@ -98,25 +98,25 @@ void modbus_handler_wrregs(void)
     
     rp = &MODBUS_RBYTE(6);
        
-    for(uint8_t i=0; i<=n; i++){
+    for(uint8_t i=0; i<n; i++){
         tvar = (uint16_t)(*(rp++));
         tvar = tvar << 8;
         tvar |= *(rp++);
-        scount += ucdm_set_register((uint8_t)(saddr + i), tvar);
+        ecount += ucdm_set_register((uint8_t)(saddr + i), tvar);
     }
     
     if (modbus_ctrans.broadcast){
         return;   
     }
     modbus_sm.rxtxlen = modbus_sm.aduformat->prefix_n + 5;
-    MODBUS_RBYTE(4) = scount;
+    MODBUS_RBYTE(4) = n;
     modbus_sm.aduformat->pack();
     return;
 }
 
 void modbus_handler_wrregm(void)
 {       
-    uint16_t addr =     MODBUS_RWORD(1, 2) - 1;
+    uint16_t addr =     MODBUS_RWORD(1, 2);
     uint16_t and_mask = MODBUS_RWORD(3, 4);
     uint16_t or_mask =  MODBUS_RWORD(5, 6);
     uint16_t tvar;
@@ -141,9 +141,9 @@ void modbus_handler_wrregm(void)
 void modbus_handler_rwmregs(void)
 {
     uint8_t nr = MODBUS_RBYTE(4);
-    uint16_t rsaddr = MODBUS_RWORD(1, 2) - 1;
+    uint16_t rsaddr = MODBUS_RWORD(1, 2);
     uint8_t nw = MODBUS_RBYTE(8);
-    uint16_t wsaddr = MODBUS_RWORD(5, 6) - 1;
+    uint16_t wsaddr = MODBUS_RWORD(5, 6);
     uint8_t * ap;
     uint16_t tvar;
     

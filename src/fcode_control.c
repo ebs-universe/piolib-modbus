@@ -40,7 +40,7 @@ void modbus_handler_rdexcst(void){
 }
 
 void modbus_handler_diagnostics(void){
-    uint16_t sfcode = MODBUS_RWORD(1, 2) - 1;
+    uint16_t sfcode = MODBUS_RWORD(1, 2);
     uint16_t rval;
     
     if (modbus_sm.silent && (sfcode != 0x0001)){

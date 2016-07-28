@@ -1,4 +1,5 @@
-scaffold
+scaffold/resources
 msp430
 *.kdev4
 *.kdev_include_paths
+*.idea
