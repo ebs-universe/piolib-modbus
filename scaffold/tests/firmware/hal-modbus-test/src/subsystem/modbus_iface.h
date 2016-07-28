@@ -17,6 +17,7 @@ uint8_t modbus_if_getc(void);
 uint8_t modbus_if_read(void *buffer, uint8_t len);
 
 uint8_t modbus_if_reqlock(uint8_t len);
+uint8_t modbus_if_rellock(void);
 uint8_t modbus_if_putc(uint8_t byte);
 uint8_t modbus_if_write(void *buffer, uint8_t len);
 

@@ -1,7 +1,5 @@
 
 
-
-
 #include"modbus_iface.h"
 #include<modbus/modbus.h>
 
@@ -22,6 +20,9 @@ uint8_t modbus_if_read(void *buffer, uint8_t len){
 }
 uint8_t modbus_if_reqlock(uint8_t len){
     return uart_reqlock(APP_MODBUSIF_INTFNUM, len, BYTEBUF_TOKEN_MODBUS);
+}
+uint8_t modbus_if_rellock(void){
+    return uart_rellock(APP_MODBUSIF_INTFNUM, BYTEBUF_TOKEN_MODBUS);
 }
 uint8_t modbus_if_putc(uint8_t byte){
     return uart_putc(APP_MODBUSIF_INTFNUM, byte, BYTEBUF_TOKEN_MODBUS, 0x00);

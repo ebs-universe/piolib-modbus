@@ -94,6 +94,8 @@
  *\brief UCDM Base Address for Modbus parameters. 
  */
 extern const uint8_t ucdm_modbus_base_address;
+extern const uint8_t modbus_if_rxbuf_chunksize;
+extern const uint8_t modbus_if_txbuf_chunksize;
 
 #define UCDM_MODBUS_DEVICE_ADDRESS      ucdm_modbus_base_address
 
@@ -140,7 +142,7 @@ typedef struct MODBUS_ADUFORMAT_t
     const uint8_t postfix_n;
     void (*const pack)(void);
     uint8_t (*const validate)(void);
-    uint8_t (*const write)(void);
+    void (*const write)(void);
 }modbus_aduformat_t;
 
 typedef struct MODBUS_SM_t
@@ -150,6 +152,7 @@ typedef struct MODBUS_SM_t
     uint8_t silent;
     uint8_t rxtxlen;
     uint8_t const* rxtxbuf;
+    uint8_t * txp;
 }modbus_sm_t;
 
 typedef struct MODBUS_CTRANS_t
@@ -228,6 +231,7 @@ extern uint8_t modbus_if_getc(void);
 extern uint8_t modbus_if_read(void *buffer, uint8_t len);
 
 extern uint8_t modbus_if_reqlock(uint8_t len);
+extern uint8_t modbus_if_rellock(void);
 extern uint8_t modbus_if_putc(uint8_t byte);
 extern uint8_t modbus_if_write(void *buffer, uint8_t len);
 /**@}*/ 
@@ -237,23 +241,6 @@ extern uint8_t modbus_if_write(void *buffer, uint8_t len);
  * 
  */
 /**@{*/ 
-
-/**
-  * \brief MODBUS Layer 2/3 Helper function to validate the recieved message
-  * 
-  * This function validates the message currently in the modbus_rxbuf. It 
-  * verifies the CRC, confirms the address is relevant to this slave. 
-  * It returns 1 for a valid message and 0 for an invalid one. This 
-  * function also increments the appropriate counters. 
-  * 
-  * The command length is not validated here, and should be previously
-  * verified using the crlen handlers.
-  * 
-  * If layer 2/3 gets a zero from here, it should discard the packet. If it 
-  * recieves 1, it should then call modbus_process_command() so that the 
-  * library can handle the message.
-  */
-uint8_t modbus_uart_adu_validate(void);
 
 /**
   * \brief MODBUS Layer 2/3 Helper function to calculate the CRC
@@ -272,8 +259,6 @@ uint8_t modbus_uart_adu_validate(void);
   */
 uint16_t modbus_calculate_crc(uint8_t * cmd, uint8_t len);
 
-void modbus_uart_adu_pack(void);
-uint8_t modbus_uart_adu_write(void);
 
 /**@}*/ 
 

@@ -26,6 +26,8 @@
     #define APP_ENABLE_MODBUS         1
     #define APP_MODBUSIF_TYPE         MODBUS_UART
     #define APP_MODBUSIF_INTFNUM      1
+    #define APP_MODBUSIF_RXCHUNKSIZE  5
+    #define APP_MODBUSIF_TXCHUNKSIZE  5
     /**@}*/ 
 /**@}*/ 
 

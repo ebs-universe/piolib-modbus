@@ -36,5 +36,5 @@ SLAVE_NREGS = 200
 def instrument():
     i = minimalmodbus.Instrument('/dev/ttyACM1', SLAVE_ADDRESS)
     i.serial.baudrate = SLAVE_BAUDRATE
-    i.serial.timeout = 1
+    i.serial.timeout = 0.1
     return i

@@ -48,6 +48,8 @@ static void _ucdm_init(void)
 uint16_t diagnostic_register;
 uint8_t exception_status_register;
 const uint8_t ucdm_modbus_base_address = UCDM_MODBUS_BASE_ADDRESS;
+const uint8_t modbus_if_rxbuf_chunksize = APP_MODBUSIF_RXCHUNKSIZE;
+const uint8_t modbus_if_txbuf_chunksize = APP_MODBUSIF_TXCHUNKSIZE;
 
 static void _modbus_init(void);
 

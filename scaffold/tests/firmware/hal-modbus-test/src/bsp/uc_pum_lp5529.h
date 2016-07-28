@@ -92,8 +92,8 @@
     /**@{*/ 
     #define uC_UART1_ENABLED       1
     #define uC_UART1_BAUD          256000
-    #define uC_UART1_TXBUF_LEN     200
-    #define uC_UART1_RXBUF_LEN     100
+    #define uC_UART1_TXBUF_LEN     10
+    #define uC_UART1_RXBUF_LEN     10
     #define uC_UART1_FWIF_DEFINED
     /**@}*/ 
     

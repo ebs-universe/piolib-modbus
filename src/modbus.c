@@ -36,29 +36,24 @@
 #include "dispatch.h"
 #include "diagnostics.h"
 
+#include "aduformat/uart.h"
+
 modbus_ctrans_t modbus_ctrans;
-
-const modbus_aduformat_t modbus_aduformat = {
-    1, 
-    2,
-    &modbus_uart_adu_pack,
-    &modbus_uart_adu_validate,
-    &modbus_uart_adu_write,
-};
-
 uint8_t modbus_rxtxbuf[MODBUS_ADU_MAXLEN];
 
 modbus_sm_t modbus_sm = {
-    &modbus_aduformat,
+    &modbus_aduformat_uart,
     MODBUS_ST_PREINIT,
     MODBUS_OUT_NORMAL,
     0,
+    &modbus_rxtxbuf[0],
     &modbus_rxtxbuf[0],
 };
 
 void modbus_reset_sm(void){
     modbus_sm.rxtxlen = 0;
     modbus_sm.state = MODBUS_ST_IDLE;
+    modbus_sm.txp = &modbus_rxtxbuf[0];
 }
 
 void modbus_reset_all(void){
@@ -90,6 +85,7 @@ void modbus_state_machine(void){
     // be usable as is from the application layer, as long as only one of the state 
     // machines is used consistently within the application.
     uint8_t tvar8;
+    uint8_t uvar8;
     switch(modbus_sm.state){
         case MODBUS_ST_PREINIT:
             break;
@@ -106,7 +102,16 @@ void modbus_state_machine(void){
         case MODBUS_ST_RECV:
             tvar8 = modbus_crlen();
             if (tvar8){
-                if (modbus_if_unhandled_rxb() >= tvar8){
+                uvar8 = modbus_if_unhandled_rxb();
+                if (uvar8 < tvar8){
+                    if (uvar8 >= modbus_if_rxbuf_chunksize){
+                        tvar8 = uvar8;
+                    }
+                    else{
+                        tvar8 = 0;
+                    }
+                }
+                if (tvar8){
                     modbus_if_read(&(modbus_rxtxbuf[modbus_sm.rxtxlen]), tvar8);
                     modbus_sm.rxtxlen += tvar8;
                 }
@@ -135,7 +140,10 @@ void modbus_state_machine(void){
             }
             break;
         case MODBUS_ST_SEND:
-            if (modbus_sm.aduformat->write()){
+            if (modbus_sm.rxtxlen){
+                modbus_sm.aduformat->write();
+            }
+            else{
                 modbus_reset_sm();
             }
             break;
@@ -174,48 +182,3 @@ uint16_t modbus_calculate_crc(uint8_t * cmd, uint8_t len)
   return crc;  
 }
 
-uint8_t modbus_uart_adu_validate(void){
-    //Get Address included in message
-    uint8_t apu_addr = modbus_rxtxbuf[0];
-    //Get CRC included in message
-    uint16_t apu_crc = (modbus_rxtxbuf[modbus_sm.rxtxlen-2]) | ((uint16_t)(modbus_rxtxbuf[modbus_sm.rxtxlen-1])<<8);
-    // Calculate CRC of message
-    uint16_t crc = modbus_calculate_crc(&(modbus_rxtxbuf[0]), (modbus_sm.rxtxlen-2));
-    
-    if (apu_crc != crc){
-        modbus_bus_comm_err_cnt ++;
-        return 0;
-    }
-    
-    modbus_bus_msg_cnt ++;
-    
-    if (!apu_addr){
-        modbus_ctrans.broadcast = MODBUS_CTT_BROADCAST;
-    }
-    else if(apu_addr == ucdm_register[UCDM_MODBUS_DEVICE_ADDRESS]){
-        modbus_ctrans.broadcast = MODBUS_CTT_UNICAST;
-    }
-    else{
-        return 0;
-    }
-    
-    modbus_server_msg_cnt ++;
-    return 1;
-}
-
-void modbus_uart_adu_pack(void){
-    uint16_t crc;
-    crc = modbus_calculate_crc(&modbus_rxtxbuf[0], 
-                               modbus_sm.rxtxlen);
-    modbus_rxtxbuf[modbus_sm.rxtxlen] = (uint8_t)crc;
-    modbus_rxtxbuf[modbus_sm.rxtxlen+1] = (uint8_t)(crc >> 8);
-    modbus_sm.rxtxlen += 2;
-}
-
-uint8_t modbus_uart_adu_write(void){
-    if (modbus_if_reqlock(modbus_sm.rxtxlen)){
-        modbus_if_write(&(modbus_rxtxbuf[0]), modbus_sm.rxtxlen);
-        return 1;
-    }
-    return 0;
-}
