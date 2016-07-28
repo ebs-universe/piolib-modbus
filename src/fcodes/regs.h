@@ -20,27 +20,31 @@
 */
 
 /**
- * @file fcode_special.h
- * @brief Special Function Code Handlers.
+ * @file fcode_regs.h
+ * @brief Holding and Input Register (Register Access) Function Code Handlers.
  */
 
 
-#ifndef MODBUS_FCODE_SPECIAL_H
-#define MODBUS_FCODE_SPECIAL_H
+#ifndef MODBUS_FCODE_REGS_H
+#define MODBUS_FCODE_REGS_H
 
 #include <stdint.h>
-#include "fcodes_common.h"
+#include "common.h"
 
-void modbus_handler_repsid(void);
-void modbus_handler_rdfrec(void);
-void modbus_handler_wrfrec(void);
-void modbus_handler_fifoq(void);
-void modbus_handler_eit(void);
+void modbus_handler_rdregs(void);
+void modbus_handler_wrsreg(void);
+void modbus_handler_wrregs(void);
+void modbus_handler_wrregm(void);
+void modbus_handler_rwmregs(void);
 
-extern const modbus_fcode_handler_t _repsid_handler;
-extern const modbus_fcode_handler_t _rdfrec_handler;
-extern const modbus_fcode_handler_t _wrfrec_handler;
-extern const modbus_fcode_handler_t _rdfifoq_handler;
-extern const modbus_fcode_handler_t _eit_handler;
+uint8_t modbus_crlen_wrmregs(void);
+uint8_t modbus_crlen_rwmregs(void);
+
+extern const modbus_fcode_handler_t _rdhreg_handler;
+extern const modbus_fcode_handler_t _rdireg_handler;
+extern const modbus_fcode_handler_t _wrsreg_handler;
+extern const modbus_fcode_handler_t _wrmregs_handler;
+extern const modbus_fcode_handler_t _wrregm_handler;
+extern const modbus_fcode_handler_t _rwmregs_handler;
 
 #endif

@@ -29,7 +29,7 @@
 #define MODBUS_FCODE_BITS_H
 
 #include <stdint.h>
-#include "fcodes_common.h"
+#include "common.h"
 
 void modbus_handler_rdbits(void);
 void modbus_handler_wrsbit(void);

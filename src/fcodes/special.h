@@ -20,34 +20,27 @@
 */
 
 /**
- * @file fcode_common.h
- * @brief Common Function Code Handlers.
- * 
- * @see <http://www.modbus.org/docs/Modbus_Application_Protocol_V1_1b3.pdf>
- * @see fcode_common.c
+ * @file fcode_special.h
+ * @brief Special Function Code Handlers.
  */
 
 
-#ifndef MODBUS_FCODE_COMMON_H
-#define MODBUS_FCODE_COMMON_H
+#ifndef MODBUS_FCODE_SPECIAL_H
+#define MODBUS_FCODE_SPECIAL_H
 
 #include <stdint.h>
-#define MODBUS_RBYTE(a)    ( modbus_rxtxbuf[(modbus_sm.aduformat->prefix_n) + a] )
-#define MODBUS_RWORD(a, b) (((uint16_t)(MODBUS_RBYTE(a)) << 8) | (MODBUS_RBYTE(b)))
+#include "common.h"
 
-typedef struct {
-    const uint8_t fcode;
-    const uint8_t apriorilen;
-    const uint8_t addlen_idx;
-    void (*const handler)(void);
-} modbus_fcode_handler_t;
+void modbus_handler_repsid(void);
+void modbus_handler_rdfrec(void);
+void modbus_handler_wrfrec(void);
+void modbus_handler_fifoq(void);
+void modbus_handler_eit(void);
 
-void modbus_handler_notimpl(void);
-uint8_t modbus_crlen(void);
-void modbus_build_exc_response(uint8_t ecode);
-
-extern const modbus_fcode_handler_t _unimpl_handler;
-
-/**@}*/ 
+extern const modbus_fcode_handler_t _repsid_handler;
+extern const modbus_fcode_handler_t _rdfrec_handler;
+extern const modbus_fcode_handler_t _wrfrec_handler;
+extern const modbus_fcode_handler_t _rdfifoq_handler;
+extern const modbus_fcode_handler_t _eit_handler;
 
 #endif

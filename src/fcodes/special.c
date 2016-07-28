@@ -26,9 +26,9 @@
 
 #include <ucdm/ucdm.h>
 
-#include "modbus.h"
-#include "fcodes.h"
-#include "fcode_special.h"
+#include "../modbus.h"
+#include "../dispatch.h"
+#include "special.h"
 
 void modbus_handler_repsid(void)
 {

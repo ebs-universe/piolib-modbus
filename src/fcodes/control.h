@@ -29,7 +29,7 @@
 #define MODBUS_FCODE_CONTROL_H
 
 #include <stdint.h>
-#include "fcodes_common.h"
+#include "common.h"
 
 void modbus_handler_rdexcst(void);
 void modbus_handler_diagnostics(void);

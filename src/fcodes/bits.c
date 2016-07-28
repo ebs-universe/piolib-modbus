@@ -20,16 +20,16 @@
 */
 
 /**
- * @file fcode_rdbits.c
+ * @file fcodes/bits.c
  * @brief Read Coils and Inputs (Bit Read) Function Code Handler Implementations.
  */
 
 #include <ucdm/ucdm.h>
 
-#include "modbus.h"
-#include "diagnostics.h"
-#include "fcodes.h"
-#include "fcode_bits.h"
+#include "../modbus.h"
+#include "../diagnostics.h"
+#include "../dispatch.h"
+#include "bits.h"
 
 
 void modbus_handler_rdbits(void)

@@ -20,20 +20,19 @@
 */
 
 /**
- * @file fcodes.h
- * @brief Interface and usage of the Modbus Function Code Handlers.
+ * @file dispatch.h
+ * @brief Interface and usage of the Modbus Function Code Dispatcher.
  * 
- * @see <http://www.modbus.org/docs/Modbus_Application_Protocol_V1_1b3.pdf>
- * @see fcodes.c
+ * @see dispatch.c
  */
 
 
-#ifndef MODBUS_FCODES_H
-#define MODBUS_FCODES_H
+#ifndef MODBUS_DISPATCH_H
+#define MODBUS_DISPATCH_H
 
 #include <stdint.h>
-#include "fcodes_config.h"
-#include "fcodes_common.h"
+#include "config.h"
+#include "fcodes/common.h"
 
 /**
  * @name Modbus Function Codes

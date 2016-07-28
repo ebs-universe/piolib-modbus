@@ -80,7 +80,7 @@
 #define MODBUS_DEFAULT_DEVICE_ADDRESS   0x05
 
 #include <stdint.h>
-#include "fcodes_common.h"
+#include "fcodes/common.h"
 
 /**
  * @name Modbus Configuration Containers

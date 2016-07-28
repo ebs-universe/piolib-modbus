@@ -33,7 +33,7 @@
 #include <ucdm/ucdm.h>
 
 #include "modbus.h"
-#include "fcodes.h"
+#include "dispatch.h"
 #include "diagnostics.h"
 
 modbus_ctrans_t modbus_ctrans;

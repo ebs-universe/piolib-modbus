@@ -20,23 +20,23 @@
 */
 
 /**
- * @file fcodes.c
- * @brief Implementation of the Modbus Function Code Handlers.
+ * @file dispatch.c
+ * @brief Implementation of the Modbus Function Code Handler Dispatcher.
  *
- * See fcodes.h for usage documentation. Implementation 
+ * See dispatch.h for usage documentation. Implementation 
  * documentation should be added to this file as some point. 
  * 
- * @see fcodes.h
+ * @see dispatch.h
  */
 
-#include "fcodes.h"
+#include "dispatch.h"
 #include "modbus.h"
 #include "diagnostics.h"
 
-#include "fcode_bits.h"
-#include "fcode_regs.h"
-#include "fcode_control.h"
-#include "fcode_special.h"
+#include "fcodes/bits.h"
+#include "fcodes/regs.h"
+#include "fcodes/control.h"
+#include "fcodes/special.h"
 
 /**
  * @name Modbus Function Code Dispatch

@@ -20,31 +20,34 @@
 */
 
 /**
- * @file fcode_regs.h
- * @brief Holding and Input Register (Register Access) Function Code Handlers.
+ * @file fcodes/common.h
+ * @brief Common Function Code Handlers.
+ * 
+ * @see <http://www.modbus.org/docs/Modbus_Application_Protocol_V1_1b3.pdf>
+ * @see fcodes/common.c
  */
 
 
-#ifndef MODBUS_FCODE_REGS_H
-#define MODBUS_FCODE_REGS_H
+#ifndef MODBUS_FCODE_COMMON_H
+#define MODBUS_FCODE_COMMON_H
 
 #include <stdint.h>
-#include "fcodes_common.h"
+#define MODBUS_RBYTE(a)    ( modbus_rxtxbuf[(modbus_sm.aduformat->prefix_n) + a] )
+#define MODBUS_RWORD(a, b) (((uint16_t)(MODBUS_RBYTE(a)) << 8) | (MODBUS_RBYTE(b)))
 
-void modbus_handler_rdregs(void);
-void modbus_handler_wrsreg(void);
-void modbus_handler_wrregs(void);
-void modbus_handler_wrregm(void);
-void modbus_handler_rwmregs(void);
+typedef struct {
+    const uint8_t fcode;
+    const uint8_t apriorilen;
+    const uint8_t addlen_idx;
+    void (*const handler)(void);
+} modbus_fcode_handler_t;
 
-uint8_t modbus_crlen_wrmregs(void);
-uint8_t modbus_crlen_rwmregs(void);
+void modbus_handler_notimpl(void);
+uint8_t modbus_crlen(void);
+void modbus_build_exc_response(uint8_t ecode);
 
-extern const modbus_fcode_handler_t _rdhreg_handler;
-extern const modbus_fcode_handler_t _rdireg_handler;
-extern const modbus_fcode_handler_t _wrsreg_handler;
-extern const modbus_fcode_handler_t _wrmregs_handler;
-extern const modbus_fcode_handler_t _wrregm_handler;
-extern const modbus_fcode_handler_t _rwmregs_handler;
+extern const modbus_fcode_handler_t _unimpl_handler;
+
+/**@}*/ 
 
 #endif

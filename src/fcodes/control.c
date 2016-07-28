@@ -26,10 +26,10 @@
 
 #include <ucdm/ucdm.h>
 
-#include "modbus.h"
-#include "diagnostics.h"
-#include "fcodes.h"
-#include "fcode_control.h"
+#include "../modbus.h"
+#include "../diagnostics.h"
+#include "../dispatch.h"
+#include "control.h"
 
 
 void modbus_handler_rdexcst(void){

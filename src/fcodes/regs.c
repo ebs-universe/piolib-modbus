@@ -26,10 +26,10 @@
 
 #include <ucdm/ucdm.h>
 
-#include "modbus.h"
-#include "diagnostics.h"
-#include "fcodes.h"
-#include "fcode_regs.h"
+#include "../modbus.h"
+#include "../diagnostics.h"
+#include "../dispatch.h"
+#include "regs.h"
 
 // TODO
 // It _may_ be possible to refactor these functions to reduce code duplication

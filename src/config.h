@@ -20,7 +20,7 @@
 */
 
 /**
- * @file fcodes_config.h
+ * @file config.h
  * @brief Configuration of Function Code Handler Inclusion.
  */
 

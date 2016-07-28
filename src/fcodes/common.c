@@ -29,10 +29,10 @@
  * @see fcode_common.h
  */
 
-#include "modbus.h"
-#include "diagnostics.h"
-#include "fcodes.h"
-#include "fcodes_common.h"
+#include "../modbus.h"
+#include "../diagnostics.h"
+#include "../dispatch.h"
+#include "common.h"
 
 
 void modbus_handler_notimpl(void){
