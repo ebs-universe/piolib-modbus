@@ -35,7 +35,7 @@
 #define MODBUS_RBYTE(a)    ( modbus_rxtxbuf[(modbus_sm.aduformat->prefix_n) + a] )
 #define MODBUS_RWORD(a, b) (((uint16_t)(MODBUS_RBYTE(a)) << 8) | (MODBUS_RBYTE(b)))
 
-typedef struct {
+typedef struct MODBUS_FCODE_HANDLER_t{
     const uint8_t fcode;
     const uint8_t apriorilen;
     const uint8_t addlen_idx;

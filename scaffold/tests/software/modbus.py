@@ -37,4 +37,5 @@ def instrument():
     i = minimalmodbus.Instrument('/dev/ttyACM1', SLAVE_ADDRESS)
     i.serial.baudrate = SLAVE_BAUDRATE
     i.serial.timeout = 0.1
+    i.debug = True
     return i
