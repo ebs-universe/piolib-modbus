@@ -1,8 +1,9 @@
-/*  
-   Copyright 2016 Chintalagiri Shashank, Quazar Technologies Pvt. Ltd.
-    
+/* 
+   Copyright 2015 Quazar Technologies Pvt. Ltd.
+   Copyright 2015 Chintalagiri Shashank
+   
    This file is part of
-   Embedded bootstraps : hal-uC
+   Embedded bootstraps : Peripheral driver implementations : MSP430
    
    This library is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published
@@ -18,16 +19,5 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
-/**
- * @file hal_uc_types.h
- * @brief HAL for uC Type definitions
- *
- * 
- */
-
-#ifndef HAL_UC_TYPES_H
-#define HAL_UC_TYPES_H
-
-#include "uc_types_impl.h"
-
-#endif
+#include "hal_uc_map.h"
+#include "hal_uc_gpio.h"

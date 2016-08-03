@@ -55,6 +55,8 @@
 #define SUBSYSTEMS_H
 
 #include "bc_iface.h"
+#include "ucdm_iface.h"
+#include "time_iface.h"
 #include "modbus_iface.h"
 
 #endif

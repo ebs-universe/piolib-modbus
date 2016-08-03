@@ -23,7 +23,7 @@
  * @file devicemap.h
  * @brief Map of device configuration and data access parameters.
  *
- * This file, and the file hierarchy that it includes, if any should 
+ * This file, and the file hierarchy that it includes, if any, should 
  * define all the configuration and data access parameters that the 
  * device exposes via the ucdm interface. 
  * 

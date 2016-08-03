@@ -81,7 +81,7 @@ void modbus_clear_counters(void){
 void modbus_clear_diagnostics(void){
     modbus_clear_eventlog();
     modbus_clear_counters();
-    diagnostic_register = 0x0000;
+    *modbus_diagnostic_register_p = 0x0000;
 }
 
 void modbus_init_eventlog(void){

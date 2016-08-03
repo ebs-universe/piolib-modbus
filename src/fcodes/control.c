@@ -33,7 +33,7 @@
 
 
 void modbus_handler_rdexcst(void){
-    MODBUS_RBYTE(1) = exception_status_register;
+    MODBUS_RBYTE(1) = *modbus_exception_status_p;
     modbus_sm.rxtxlen = modbus_sm.aduformat->prefix_n + 2;
     modbus_sm.aduformat->pack();
     return;
@@ -84,7 +84,7 @@ void modbus_handler_diagnostics(void){
             }
             modbus_sm.silent = MODBUS_OUT_NORMAL;
         case MB_SFC_DAIG_CLRCNTS:
-            diagnostic_register = 0x0000;
+            *modbus_diagnostic_register_p = 0x0000;
             modbus_clear_counters();
         case MB_SFC_DAIG_CLRBCHOVCNT:
             modbus_bus_char_overrun_cnt = 0;
@@ -93,7 +93,7 @@ void modbus_handler_diagnostics(void){
             rval = MODBUS_RWORD(3, 4);
             break;
         case MB_SFC_DAIG_RETDIAGR:
-            rval = diagnostic_register;
+            rval = *modbus_diagnostic_register_p;
             break;
         case MB_SFC_DAIG_RETBMCNT:
             rval = modbus_bus_msg_cnt;

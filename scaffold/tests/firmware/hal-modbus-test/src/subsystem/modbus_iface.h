@@ -4,11 +4,15 @@
 #ifndef MODBUS_IFACE_H
 #define MODBUS_IFACE_H
 
-#include"board_pum.h"
 #include"application.h"
 #include"hal_uc.h"
+#include <modbus/modbus.h>
 
 #define BYTEBUF_TOKEN_MODBUS    0x06
+
+static inline void app_modbus_init(void){
+    modbus_init();
+}
 
 void modbus_if_init(void);
 

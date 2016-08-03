@@ -1,8 +1,16 @@
 
 
+
+
 #include"modbus_iface.h"
 #include<modbus/modbus.h>
+#include"ucdm_iface.h"
 
+uint16_t *const modbus_diagnostic_register_p = &ucdm_diagnostic_register;
+uint8_t  *const modbus_exception_status_p = &ucdm_exception_status;
+const uint8_t ucdm_modbus_base_address = UCDM_MODBUS_BASE_ADDRESS;
+const uint8_t modbus_if_rxbuf_chunksize = APP_MODBUSIF_RXCHUNKSIZE;
+const uint8_t modbus_if_txbuf_chunksize = APP_MODBUSIF_TXCHUNKSIZE;
 
 void modbus_if_init(void){
     uart_if[APP_MODBUSIF_INTFNUM]->state->overrun_counter = &modbus_bus_char_overrun_cnt;

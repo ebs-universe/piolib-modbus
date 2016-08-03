@@ -3,7 +3,7 @@
    Copyright 2015 Chintalagiri Shashank
    
    This file is part of
-   Embedded bootstraps : Peripheral driver implementations : MSP430
+   Embedded bootstraps : Subsystem Interfaces
    
    This library is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published
@@ -19,4 +19,26 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
-#include "hal_uc_gpio.h"
+/**
+ * @file time_iface.h
+ * @brief Time Library Interface
+ * 
+ */
+
+#ifndef TIME_IF_H
+#define TIME_IF_H
+
+#include "application.h"
+#include "hal_uc.h"
+#include <time/time.h>
+
+
+#if APP_ENABLE_SYSTICK == 1
+    void systick_init(void);
+#endif
+    
+#if APP_ENABLE_RTC == 1
+    uint8_t time_get_rtc_time(tm_real_t * rtime_target);
+#endif
+
+#endif
