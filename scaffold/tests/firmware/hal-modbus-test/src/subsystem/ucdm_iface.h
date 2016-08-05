@@ -7,10 +7,7 @@
 
 #include"application.h"
 #include"hal_uc.h"
-
-extern uint16_t ucdm_diagnostic_register;
-extern uint8_t  ucdm_exception_status;
-
+#include<ucdm/ucdm.h>
 
 void app_ucdm_init(void);
 

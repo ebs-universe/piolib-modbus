@@ -183,7 +183,7 @@ int main(void)
     power_set_full();
     clock_set_default();
     
-    tm_init();
+    //tm_init();
     
     global_interrupt_enable();
     

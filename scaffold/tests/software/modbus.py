@@ -24,17 +24,24 @@ Docstring for modbus
 
 import os
 import pytest
-import minimalmodbus
+from pymodbus.client.sync import ModbusSerialClient as ModbusClient
 
 SLAVE_NREGS = 200
 
 
 @pytest.fixture
-def instrument(request):
+def client(request):
     port = os.path.join('/dev', request.config.getoption('--port'))
-    saddress = int(request.config.getoption('--saddress'))
-    i = minimalmodbus.Instrument(port, saddress)
-    i.serial.baudrate = int(request.config.getoption('--baud'))
-    i.serial.timeout = 0.1
-    i.debug = True
-    return i
+    mclient = ModbusClient(method='rtu', port=port, timeout=0.1,
+                           baudrate=int(request.config.getoption('--baud')))
+    mclient.connect()
+
+    def done():
+        mclient.close()
+    request.addfinalizer(done)
+    return mclient
+
+
+@pytest.fixture
+def saddress(request):
+    return int(request.config.getoption('--saddress'))
