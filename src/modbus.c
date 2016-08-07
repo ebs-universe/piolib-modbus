@@ -31,6 +31,8 @@
 
 #include <bytebuf/bytebuf.h>
 #include <ucdm/ucdm.h>
+#include <time/time.h>
+#include <time/cron.h>
 
 #include "modbus.h"
 #include "dispatch.h"
@@ -40,6 +42,11 @@
 
 modbus_ctrans_t modbus_ctrans;
 uint8_t modbus_rxtxbuf[MODBUS_ADU_MAXLEN];
+
+#if MODBUS_USE_TIMEOUTS && MODBUS_TIMEOUT_TYPE == MODBUS_TIMEOUT_INTERNAL
+uint32_t modbus_next_timeout;
+#elif MODBUS_USE_TIMEOUTS && MODBUS_TIMEOUT_TYPE == MODBUS_TIMEOUT_CRON
+#endif
 
 modbus_sm_t modbus_sm = {
     &modbus_aduformat_uart,
@@ -92,6 +99,10 @@ void modbus_state_machine(void){
         case MODBUS_ST_IDLE:
             tvar8 = modbus_sm.aduformat->prefix_n + 1;
             if (modbus_if_unhandled_rxb() >= tvar8){
+                #if MODBUS_USE_TIMEOUTS && MODBUS_TIMEOUT_TYPE == MODBUS_TIMEOUT_INTERNAL
+                modbus_next_timeout = tm_current.seconds + 1;
+                #elif MODBUS_USE_TIMEOUTS && MODBUS_TIMEOUT_TYPE == MODBUS_TIMEOUT_CRON
+                #endif
                 modbus_if_read(&(modbus_rxtxbuf[0]), tvar8);
                 modbus_sm.rxtxlen = tvar8;
                 modbus_ctrans.fcode = modbus_rxtxbuf[tvar8-1];
@@ -112,11 +123,25 @@ void modbus_state_machine(void){
                     }
                 }
                 if (tvar8){
+                    #if MODBUS_USE_TIMEOUTS && MODBUS_TIMEOUT_TYPE == MODBUS_TIMEOUT_INTERNAL
+                    modbus_next_timeout = tm_current.seconds + 2;
+                    #elif MODBUS_USE_TIMEOUTS && MODBUS_TIMEOUT_TYPE == MODBUS_TIMEOUT_CRON
+                    #endif
                     modbus_if_read(&(modbus_rxtxbuf[modbus_sm.rxtxlen]), tvar8);
                     modbus_sm.rxtxlen += tvar8;
                 }
+                else{
+                    if (tm_current.seconds > modbus_next_timeout){
+                        // TODO Also flush rxbuf?
+                        modbus_reset_sm();
+                    }
+                }
             }
             else{
+                #if MODBUS_USE_TIMEOUTS && MODBUS_TIMEOUT_TYPE == MODBUS_TIMEOUT_INTERNAL
+                modbus_next_timeout = 0;
+                #elif MODBUS_USE_TIMEOUTS && MODBUS_TIMEOUT_TYPE == MODBUS_TIMEOUT_CRON
+                #endif
                 modbus_sm.state = MODBUS_ST_VERIFY;
             }
             break;
