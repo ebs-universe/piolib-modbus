@@ -64,7 +64,7 @@ uint8_t modbus_uart_adu_validate(void){
     if (!apu_addr){
         modbus_ctrans.broadcast = MODBUS_CTT_BROADCAST;
     }
-    else if(apu_addr == ucdm_register[UCDM_MODBUS_DEVICE_ADDRESS]){
+    else if(apu_addr == ucdm_register[UCDM_MODBUS_DEVICE_ADDRESS].data){
         modbus_ctrans.broadcast = MODBUS_CTT_UNICAST;
     }
     else{

@@ -77,7 +77,8 @@ void modbus_handler_wrsreg(void)
         modbus_build_exc_response(0x02);
         return;
     }
-    uint8_t res = ucdm_set_register(MODBUS_RBYTE(2), MODBUS_RWORD(3, 4));
+    uint8_t res = ucdm_set_register(MODBUS_RWORD(1, 2), 
+                                    MODBUS_RWORD(3, 4));
     if (res){
         modbus_build_exc_response(0x02);
         return;
@@ -106,7 +107,7 @@ void modbus_handler_wrregs(void)
         tvar = (uint16_t)(*(rp++));
         tvar = tvar << 8;
         tvar |= *(rp++);
-        ecount += ucdm_set_register((uint8_t)(saddr + i), tvar);
+        ecount += ucdm_set_register(saddr + i, tvar);
     }
     
     if (modbus_ctrans.broadcast){
@@ -131,9 +132,9 @@ void modbus_handler_wrregm(void)
         return;
     }
     
-    tvar = ucdm_get_register((uint8_t)addr);
+    tvar = ucdm_get_register(addr);
     tvar = (tvar & and_mask) | (or_mask & (!and_mask));
-    res = ucdm_set_register((uint8_t)addr, tvar);
+    res = ucdm_set_register(addr, tvar);
     
     if(res){
         modbus_build_exc_response(0x02);
@@ -162,7 +163,7 @@ void modbus_handler_rwmregs(void)
         tvar = (uint16_t)(*(ap++));
         tvar = tvar << 8;
         tvar |= *(ap++);
-        ucdm_set_register((uint8_t)(wsaddr + i), tvar);
+        ucdm_set_register(wsaddr + i, tvar);
     }
     
     if (modbus_ctrans.broadcast){

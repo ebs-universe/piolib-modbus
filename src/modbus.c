@@ -72,7 +72,7 @@ static inline void _modbus_init_interface(void);
 
 static inline void _modbus_init_interface(void){
     modbus_if_init();
-    ucdm_register[UCDM_MODBUS_DEVICE_ADDRESS] = MODBUS_DEFAULT_DEVICE_ADDRESS;
+    ucdm_register[UCDM_MODBUS_DEVICE_ADDRESS].data = MODBUS_DEFAULT_DEVICE_ADDRESS;
 }
 
 void modbus_init(void){
