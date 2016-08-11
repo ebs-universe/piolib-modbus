@@ -45,7 +45,10 @@
 /**
  * \brief Recognized Modbus Function Codes and Handler Addresses
  * 
- * TODO Consider replacing with a proper binary search tree?
+ * These are all constructed and put in place at compile time and are 
+ * never copied into the RAM. This is a much less resource intensive 
+ * approach compared to the AVL trees of UCDM handlers, which need to 
+ * reside in RAM since the specifics are 'unknown' at compile time. 
  * 
  */
 static const modbus_fcode_handler_t *modbus_fcode_handlers[]={
@@ -85,6 +88,8 @@ const modbus_fcode_handler_t* modbus_get_fcode_handler(uint8_t fcode){
     
     // TODO Figure out if the setup overhead actually makes this _less_ efficient 
     // than a naive linear search.
+    
+    // TODO Consider integration into libds / reuse of libds functions.
     
     while(low <= high){
         middle = (low + high) / 2;
