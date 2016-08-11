@@ -1,4 +1,5 @@
 scaffold/resources
+avr
 msp430
 *.kdev4
 *.kdev_include_paths
