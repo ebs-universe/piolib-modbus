@@ -3,14 +3,11 @@
 
 
 
-
 #include "ucdm_iface.h"
 
 uint8_t DMAP_MAXREGS = DMAP_MAX_REGISTERS;
-uint16_t ucdm_register[DMAP_MAX_REGISTERS];
+ucdm_register_t ucdm_register[DMAP_MAX_REGISTERS];
 uint8_t  ucdm_acctype[DMAP_MAX_REGISTERS];
-void ( *ucdm_rw_handler[DMAP_MAX_REGISTERS] )(uint8_t);
-void ( *ucdm_bw_handler[DMAP_MAX_REGISTERS] )(uint8_t, uint16_t);
 
 void app_ucdm_init(void)
 {

@@ -68,9 +68,9 @@
     */
     /**@{*/ 
     #define APP_ENABLE_MODBUS         1
-    #define APP_MODBUSIF_TYPE         MODBUS_UART
+    #define APP_MODBUSIF_TYPE         MODBUS_USBCDC
     #define APP_MODBUSIF_INTFNUM      1
-    #define APP_MODBUSIF_RXCHUNKSIZE  5
+    #define APP_MODBUSIF_RXCHUNKSIZE  4
     #define APP_MODBUSIF_TXCHUNKSIZE  1
     /**@}*/ 
 /**@}*/ 
@@ -82,11 +82,16 @@
 #define APP_ENABLE_RTC                1
 
 // Core HAL Configuration. Should be calculated instead.
+#define uC_USBCDC_ENABLED           1
+#define uC_USBHID_ENABLED           0
+#define uC_USBMSC_ENABLED           0
+#define uC_USBPHDC_ENABLED          0
+
 #define uC_TIMER1_ENABLED             1
 #define uC_TIMER1_TOP_IRQ_HANDLER     time_systick_handler
 
 #define uC_UART0_ENABLED              0
-#define uC_UART1_ENABLED              1
+#define uC_UART1_ENABLED              0
 #define uC_UART1_BAUD                 256000
 
 #include "board.h"

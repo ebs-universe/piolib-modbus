@@ -100,6 +100,9 @@ void modbus_uart_adu_write(void){
         modbus_sm.rxtxlen -= tvar8;
         modbus_sm.txp += tvar8;
     }
+    if(!modbus_sm.rxtxlen){
+        modbus_if_flush();
+    }
     modbus_if_rellock();
     return;
 }

@@ -26,6 +26,8 @@
 #include "msp430-driverlib/MSP430F5xx_6xx/timer_a.h"
 #include "msp430-driverlib/MSP430F5xx_6xx/timer_b.h"
 
+#ifdef uC_INCLUDE_TIMER_IFACE
+
 #if uC_TIMER0_ENABLED
     static const _timer_hwif_t _timer0_hwif = {
         uC_TIMER0_TYPE, uC_TIMER0_BASE, 
@@ -132,4 +134,6 @@ const timer_if_t *const timer_if[4] = {
         HWREG16(timer_if[intfnum]->hwif->base + OFS_TAxCTL) |= uC_TIMER_DEFAULT_CLKSOURCE;
         HWREG16(timer_if[intfnum]->hwif->base + OFS_TAxCTL) |= TACLR;
     }
+#endif
+
 #endif

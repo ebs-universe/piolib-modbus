@@ -238,6 +238,7 @@ extern uint8_t modbus_if_reqlock(uint8_t len);
 extern uint8_t modbus_if_rellock(void);
 extern uint8_t modbus_if_putc(uint8_t byte);
 extern uint8_t modbus_if_write(void *buffer, uint8_t len);
+extern void modbus_if_flush(void);
 /**@}*/ 
 
 /**

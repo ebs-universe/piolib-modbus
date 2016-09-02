@@ -78,5 +78,6 @@
 #include "hal_uc_gpio.h"
 #include "hal_uc_uart.h"
 #include "hal_uc_timer.h"
+#include "hal_uc_usb.h"
 
 #endif

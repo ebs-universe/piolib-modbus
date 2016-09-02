@@ -28,6 +28,11 @@
 #ifndef HAL_UC_TIMER_H
 #define HAL_UC_TIMER_H
 
+#include "hal_uc_map.h"
+
+#ifdef uC_INCLUDE_TIMER_IFACE
+
+
 /*
  * Least common denominator timer configuration types :
  * 
@@ -86,6 +91,8 @@ static inline void timer_disable_int_ch( uint8_t intfnum, uint8_t channel);
 
 // Set the channel compare match value.
 static inline void timer_set_cmr_ch(uint8_t intfnum, uint8_t channel, uint16_t cm);
+
+#endif
 
 #include "timer_impl.h"
 #include "timer_handlers.h"
