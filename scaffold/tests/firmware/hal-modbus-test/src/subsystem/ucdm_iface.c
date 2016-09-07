@@ -3,6 +3,7 @@
 
 
 
+#include <ucdm/ucdm.h>
 #include "ucdm_iface.h"
 
 uint8_t DMAP_MAXREGS = DMAP_MAX_REGISTERS;
@@ -22,6 +23,5 @@ void app_ucdm_init(void)
         ucdm_enable_bitw(i);
     }
     ucdm_exception_status = 0x80;
-    
 }
 

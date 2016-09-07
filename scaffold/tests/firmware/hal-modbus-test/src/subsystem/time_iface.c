@@ -1,8 +1,20 @@
 
 
 
-
+#include <ucdm/ucdm.h>
+#include <time/time.h>
+#include <time/sync.h>
 #include"time_iface.h"
+
+#define UCDM_TIME_SYSTEM_ADDRESS         UCDM_TIME_BASE_ADDRESS
+#define UCDM_TIME_EPOCH_ADDRESS         (UCDM_TIME_BASE_ADDRESS  + (sizeof(tm_system_t) / 2) + (sizeof(tm_system_t) % 2 != 0))
+#define UCDM_TIME_SYNC_HANDLER_ADDRESS  (UCDM_TIME_EPOCH_ADDRESS + (sizeof(tm_real_t) / 2)   + (sizeof(tm_real_t) % 2 != 0))
+
+void app_tm_init(void)
+{
+    tm_init(UCDM_TIME_BASE_ADDRESS);
+    tm_sync_init(UCDM_TIME_SYNC_HANDLER_ADDRESS);
+}
 
 #if APP_ENABLE_SYSTICK == 1
 void systick_init(void){

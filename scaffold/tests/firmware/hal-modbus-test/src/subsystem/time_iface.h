@@ -32,6 +32,7 @@
 #include "hal_uc.h"
 #include <time/time.h>
 
+void app_tm_init(void);
 
 #if APP_ENABLE_SYSTICK == 1
     void systick_init(void);

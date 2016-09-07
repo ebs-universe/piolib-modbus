@@ -10,6 +10,9 @@
 
 #define BYTEBUF_TOKEN_MODBUS    0x06
 
+extern uint16_t *const modbus_diagnostic_register_p;
+extern uint8_t  *const modbus_exception_status_p;
+
 static inline void app_modbus_init(void){
     modbus_init();
 }
