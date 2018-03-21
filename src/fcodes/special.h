@@ -35,12 +35,10 @@ void modbus_handler_repsid(void);
 void modbus_handler_rdfrec(void);
 void modbus_handler_wrfrec(void);
 void modbus_handler_fifoq(void);
-void modbus_handler_eit(void);
 
 extern const modbus_fcode_handler_t _repsid_handler;
 extern const modbus_fcode_handler_t _rdfrec_handler;
 extern const modbus_fcode_handler_t _wrfrec_handler;
 extern const modbus_fcode_handler_t _rdfifoq_handler;
-extern const modbus_fcode_handler_t _eit_handler;
 
 #endif

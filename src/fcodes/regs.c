@@ -20,15 +20,15 @@
 */
 
 /**
- * @file fcode_rdregs.c
- * @brief Read Holding and Input Register (Register Read) Function Code Handler Implementations.
+ * @file fcode_regs.c
+ * @brief Register Function Codes Handler Implementations.
  */
 
 #include <ucdm/ucdm.h>
 
 #include "../modbus.h"
-#include "../diagnostics.h"
 #include "../dispatch.h"
+#include "../diagnostics.h"
 #include "regs.h"
 
 // TODO

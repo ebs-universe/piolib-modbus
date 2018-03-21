@@ -39,6 +39,7 @@
 #include "diagnostics.h"
 
 #include "aduformat/uart.h"
+#include "fcodes/crlen.h"
 
 modbus_ctrans_t modbus_ctrans;
 uint8_t modbus_rxtxbuf[MODBUS_ADU_MAXLEN];
@@ -68,17 +69,30 @@ void modbus_reset_all(void){
     modbus_reset_sm();
 }
 
-static inline void _modbus_init_interface(void);
 
-static inline void _modbus_init_interface(void){
-    modbus_if_init();
-    ucdm_register[UCDM_MODBUS_DEVICE_ADDRESS].data = MODBUS_DEFAULT_DEVICE_ADDRESS;
+void modbus_set_address(uint16_t tmodbus_address){
+    *modbus_address_p = tmodbus_address;
 }
 
-void modbus_init(void){
-    _modbus_init_interface();
+
+static inline uint16_t _modbus_init_interface(uint16_t ucdm_next_address, 
+                                              uint16_t tmodbus_address);
+
+static inline uint16_t _modbus_init_interface(uint16_t ucdm_next_address, 
+                                              uint16_t tmodbus_address){
+    modbus_if_init();
+    modbus_ucdm_address = ucdm_next_address;
+    modbus_address_p = &(ucdm_register[modbus_ucdm_address].data);
+    modbus_set_address(tmodbus_address);
+    return ucdm_next_address++;
+}
+
+
+uint16_t modbus_init(uint16_t ucdm_next_address, uint16_t tmodbus_address){
+    ucdm_next_address = _modbus_init_interface(ucdm_next_address, tmodbus_address);
     modbus_init_diagnostics();
     modbus_reset_all();
+    return ucdm_next_address;
 }
 
 
@@ -173,7 +187,6 @@ void modbus_state_machine(void){
             }
             break;
     }
-    
 }
 
 uint8_t modbus_process_command(void){

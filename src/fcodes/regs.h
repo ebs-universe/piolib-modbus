@@ -37,9 +37,6 @@ void modbus_handler_wrregs(void);
 void modbus_handler_wrregm(void);
 void modbus_handler_rwmregs(void);
 
-uint8_t modbus_crlen_wrmregs(void);
-uint8_t modbus_crlen_rwmregs(void);
-
 extern const modbus_fcode_handler_t _rdhreg_handler;
 extern const modbus_fcode_handler_t _rdireg_handler;
 extern const modbus_fcode_handler_t _wrsreg_handler;

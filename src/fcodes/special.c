@@ -50,11 +50,6 @@ void modbus_handler_fifoq(void)
     modbus_handler_notimpl();
 }
 
-void modbus_handler_eit(void)
-{
-    modbus_handler_notimpl();
-}
-
 const modbus_fcode_handler_t _repsid_handler = {
     MB_FC_REP_SID,
     1, 0,
@@ -95,12 +90,3 @@ const modbus_fcode_handler_t _rdfifoq_handler = {
     #endif
 };
 
-const modbus_fcode_handler_t _eit_handler = {
-    MB_FC_EIT,
-    0, 0,
-    #if MB_SUPPORT_FC_EIT
-        &modbus_handler_eit,
-    #else
-        &modbus_handler_notimpl,
-    #endif
-};

@@ -36,6 +36,7 @@
 #include "fcodes/bits.h"
 #include "fcodes/regs.h"
 #include "fcodes/control.h"
+#include "fcodes/eit.h"
 #include "fcodes/special.h"
 
 /**

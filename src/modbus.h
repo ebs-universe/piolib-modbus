@@ -26,45 +26,42 @@
  * This file is the Public API of the MODBUS library.
  * 
  * This file provides a library to handle the MODBUS application protocol. 
- * The bulk of this library corresponds roughly to the OSI Layer 7. 
  * 
- * The bulk of the OSI Layer 2 / 3 implementation of the protocol, the 
- * harware and link specification, is left to other libraries and utilized 
- * here from within the modbus state machine via the application-dependent 
- * external functions, which should be implemented in the application and 
- * be available at link time. 
+ * The bulk of the transport layer of the protocol is left to other libraries 
+ * and utilized here from within the modbus state machine, via the 
+ * application-dependent external functions. These functions should be 
+ * implemented in the application and be available at link time. 
  * 
  * Alternatively, the modbus state machine can be bypassed entirely and the
- * application must implement the state machine. It can use the layer 2/3 
+ * application must implement the state machine. It can use the transport  
  * helper functions to aid in handling the protocol. The modbus command 
  * handling functions should be called once the ADU is verified and the 
  * buffers are ready with the full PDU as described below. 
  * 
  * The nature of MODBUS presents a complication related to operating MODBUS 
  * over an interface such as CDC, where timing cannot be guaranteed. As a 
- * result, the underlying layer 2 implementation is insufficent to 
+ * result, the underlying transport implementation is insufficent to 
  * properly detect start and end of packets. 
  * 
- * This file therefore includes various helper functions that flesh out
- * the lower layers of the interface. These helper functions can be used 
- * to help handle packet reception. It should be assumed that these 
- * functions will be called from within an interrupt context.
+ * This file includes various helper functions that flesh out the lower 
+ * layers of the interface. These functions can be used to help handle packet 
+ * reception. It should be assumed that these functions will be called from 
+ * within an interrupt context.
  * 
  * Once the packet is fully recieved into the modbus_rxbuf, the primary 
  * modbus API function `modbus_process_command()` should be called. This 
  * function will then fill out the modbus_txbuf buffer, and hand it off 
- * to the underlying layer 3 implementation for a relatively simpler
- * transmission.
+ * to the underlying transport layer for a relatively simple transmission.
  * 
  * It should be noted that this MODBUS implementation would scale poorly to 
  * multiple devices, since each message sent over the bus will have to be
- * recieved and processed for layer 2/3 to determine where the next message
- * starts. 
+ * recieved and processed by the transport layers, including verification, 
+ * to determine where the next message starts. 
  * 
  * Additionally, care must be taken while handling communications errors. 
  * MODBUS relies on the 3.5t and 1.5t timers to reset the interface after
- * a failed packet transmission. This implementation does not allow for 
- * those timers. Additional timeouts on both the slave and master may be 
+ * a failed packet transmission. This implementation has a much simplified 
+ * set of timers. Additional timeouts on both the slave and master may be 
  * necessary to resynchronize the interface. 
  * 
  * 
@@ -95,14 +92,14 @@
 /**@{*/ 
 
 /** 
- *\brief UCDM Base Address for Modbus parameters. 
+ *\brief MODBUS Interface Constant. 
  */
-extern const uint8_t ucdm_modbus_base_address;
 extern const uint8_t modbus_if_rxbuf_chunksize;
+
+/** 
+ *\brief MODBUS Interface Constant. 
+ */
 extern const uint8_t modbus_if_txbuf_chunksize;
-
-#define UCDM_MODBUS_DEVICE_ADDRESS      ucdm_modbus_base_address
-
 /**@}*/ 
 
 /**
@@ -166,6 +163,9 @@ typedef struct MODBUS_CTRANS_t
     const modbus_fcode_handler_t * fcode_handler;
 }modbus_ctrans_t;
 
+
+uint16_t * modbus_address_p;
+uint16_t modbus_ucdm_address;
 extern modbus_sm_t modbus_sm;
 extern modbus_ctrans_t modbus_ctrans;
 extern const modbus_aduformat_t modbus_aduformat;
@@ -179,7 +179,8 @@ extern uint8_t modbus_rxtxbuf[MODBUS_ADU_MAXLEN];
  */
 /**@{*/ 
 
-void modbus_init(void);
+uint16_t modbus_init(uint16_t ucdm_next_address, uint16_t tmodbus_address);
+void modbus_set_address(uint16_t tmodbus_address);
 void modbus_reset_sm(void);
 void modbus_reset_all(void);
 
@@ -258,7 +259,7 @@ extern void modbus_if_flush(void);
   * but it is small. Alternatively, layer 2/3 can implement it's own CRC 
   * generation function and use that instead.
   * 
-  * @param *cmd Pointer to the modbus command rx buffer with the full command. 
+  * @param cmd Pointer to the modbus command rx buffer with the full command. 
   *             This should point to the first byte of the ADU, ie, the address byte.
   * @param len Number of bytes already available.
   */

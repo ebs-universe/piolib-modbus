@@ -27,8 +27,8 @@
 #include <ucdm/ucdm.h>
 
 #include "../modbus.h"
-#include "../diagnostics.h"
 #include "../dispatch.h"
+#include "../diagnostics.h"
 #include "control.h"
 
 

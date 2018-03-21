@@ -40,26 +40,6 @@ void modbus_handler_notimpl(void){
     return;
 }
 
-uint8_t modbus_crlen(void){
-    uint8_t apriorilen = modbus_ctrans.fcode_handler->apriorilen;
-    uint8_t addllen;
-    if (!apriorilen){
-        return 0;
-    }
-    apriorilen += modbus_sm.aduformat->prefix_n;
-    if (modbus_sm.rxtxlen < apriorilen){
-        return(apriorilen - modbus_sm.rxtxlen);
-    }
-    else{
-        if (modbus_ctrans.fcode_handler->addlen_idx){
-            addllen = MODBUS_RBYTE(modbus_ctrans.fcode_handler->addlen_idx);
-            return(apriorilen + addllen + modbus_sm.aduformat->postfix_n - modbus_sm.rxtxlen);
-        }
-        else{
-            return(apriorilen + modbus_sm.aduformat->postfix_n - modbus_sm.rxtxlen);
-        }
-    }
-}
 
 void modbus_build_exc_response(uint8_t ecode){
     modbus_bus_exception_cnt ++;

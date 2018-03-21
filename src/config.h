@@ -52,8 +52,8 @@
 #define MB_SUPPORT_FC_RW_MREGS                  1
 #define MB_SUPPORT_FC_RD_FIFOQ                  0
                                       
-#define MB_SUPPORT_FC_EIT                       0
-    #define MB_SUPPORT_SFC_EIT_CANOPEN          1
+#define MB_SUPPORT_FC_EIT                       1
+    #define MB_SUPPORT_SFC_EIT_CANOPEN          0
     #define MB_SUPPORT_SFC_EIT_RDDEVID          1
         
 #define MB_SUPPORT_FC_DIAGNOSTICS               1

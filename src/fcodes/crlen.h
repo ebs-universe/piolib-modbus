@@ -20,32 +20,23 @@
 */
 
 /**
- * @file fcodes/common.h
- * @brief Common Function Code Handlers.
+ * @file fcodes/crlen.h
+ * @brief MODBUS Ccommand Length Calculator
+ * 
+ * Calculates the residual command lengths for MODBUS commands in a 
+ * manner that allows for command content based framing.
  * 
  * @see <http://www.modbus.org/docs/Modbus_Application_Protocol_V1_1b3.pdf>
- * @see fcodes/common.c
+ * @see fcodes/crlen.c
  */
 
 
-#ifndef MODBUS_FCODE_COMMON_H
-#define MODBUS_FCODE_COMMON_H
+#ifndef MODBUS_FCODE_CRLEN_H
+#define MODBUS_FCODE_CRLEN_H
 
 #include <stdint.h>
-#define MODBUS_RBYTE(a)    ( modbus_rxtxbuf[(modbus_sm.aduformat->prefix_n) + a] )
-#define MODBUS_RWORD(a, b) (((uint16_t)(MODBUS_RBYTE(a)) << 8) | (MODBUS_RBYTE(b)))
 
-typedef struct MODBUS_FCODE_HANDLER_t{
-    const uint8_t fcode;
-    const uint8_t apriorilen;
-    const uint8_t addlen_idx;
-    void (*const handler)(void);
-} modbus_fcode_handler_t;
-
-void modbus_handler_notimpl(void);
-void modbus_build_exc_response(uint8_t ecode);
-
-extern const modbus_fcode_handler_t _unimpl_handler;
+uint8_t modbus_crlen(void);
 
 /**@}*/ 
 
