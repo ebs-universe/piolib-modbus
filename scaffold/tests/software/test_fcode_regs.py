@@ -3,6 +3,7 @@ import pytest
 from modbus import client, saddress
 from modbus import SLAVE_NREGS
 
+from pymodbus.exceptions import ModbusIOException
 from pymodbus import register_write_message
 from pymodbus import register_read_message
 
@@ -17,7 +18,7 @@ def test_modbus_rdregs_preliminary(client, saddress):
 
 def test_modbus_broadcast_rdregs_preliminary(client, saddress):
     rval = client.read_holding_registers(0, unit=0x00)
-    assert rval is None
+    assert isinstance(rval, ModbusIOException)
 
 
 def test_wrsreg_1b(client, saddress):

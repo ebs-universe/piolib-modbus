@@ -3,6 +3,7 @@ import pytest
 from modbus import client, saddress
 from modbus import SLAVE_NREGS
 
+from pymodbus.exceptions import ModbusIOException
 from pymodbus import diag_message
 from pymodbus import other_message
 
@@ -16,4 +17,4 @@ def test_rexcst(client, saddress):
 def test_rexcst_broadcast(client):
     request = other_message.ReadExceptionStatusRequest(unit=0x00)
     response = client.execute(request)
-    assert response is None
+    assert isinstance(response, ModbusIOException)
