@@ -73,15 +73,14 @@
 #ifndef MODBUS_H
 #define MODBUS_H
 
-#define MODBUS_ADU_MAXLEN               256
-#define MODBUS_DEFAULT_DEVICE_ADDRESS   0x05
-#define MODBUS_USE_TIMEOUTS             1
+#include <stdint.h>
+#include "config.h"
+#include "fcodes/common.h"
+
 #define MODBUS_TIMEOUT_INTERNAL         0
 #define MODBUS_TIMEOUT_CRON             1  // Not currently implemented
 #define MODBUS_TIMEOUT_TYPE             MODBUS_TIMEOUT_INTERNAL
 
-#include <stdint.h>
-#include "fcodes/common.h"
 
 /**
  * @name Modbus Configuration Containers

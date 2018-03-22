@@ -45,17 +45,19 @@ modbus_ctrans_t modbus_ctrans;
 uint8_t modbus_rxtxbuf[MODBUS_ADU_MAXLEN];
 
 #if MODBUS_USE_TIMEOUTS && MODBUS_TIMEOUT_TYPE == MODBUS_TIMEOUT_INTERNAL
-uint32_t modbus_next_timeout;
+    uint32_t modbus_next_timeout;
 #elif MODBUS_USE_TIMEOUTS && MODBUS_TIMEOUT_TYPE == MODBUS_TIMEOUT_CRON
 #endif
 
 modbus_sm_t modbus_sm = {
-    &modbus_aduformat_uart,
-    MODBUS_ST_PREINIT,
-    MODBUS_OUT_NORMAL,
-    0,
-    &modbus_rxtxbuf[0],
-    &modbus_rxtxbuf[0],
+    #if MODBUS_ADU_FORMAT == MODBUS_ADUFORMAT_UART
+        &modbus_aduformat_uart,
+    #endif
+        MODBUS_ST_PREINIT,
+        MODBUS_OUT_NORMAL,
+        0,
+        &modbus_rxtxbuf[0],
+        &modbus_rxtxbuf[0],
 };
 
 void modbus_reset_sm(void){
