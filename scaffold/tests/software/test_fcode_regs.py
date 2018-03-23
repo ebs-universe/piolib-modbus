@@ -2,6 +2,7 @@
 import pytest
 from modbus import client, saddress
 from modbus import SLAVE_NREGS
+from modbus import ModbusServerException
 
 from pymodbus.exceptions import ModbusIOException
 from pymodbus import register_write_message
@@ -34,6 +35,7 @@ def test_wrsreg_broadcast(client, saddress):
     request = register_write_message.WriteSingleRegisterRequest(
         TEST_ADDRESS_BASE + 10, 100, unit=0x00)
     response = client.execute(request)
+    assert isinstance(response, ModbusIOException)
     rval = client.read_holding_registers(TEST_ADDRESS_BASE + 10, unit=saddress)
     assert rval.registers[0] == 100
 
@@ -50,8 +52,8 @@ def test_wrsreg_2b(client, saddress):
 def test_wrsreg_protected(client, saddress):
     request = register_write_message.WriteSingleRegisterRequest(
         1, 4, unit=saddress)
-    response = client.execute(request)
-    assert response.function_code > 0x80
+    with pytest.raises(ModbusServerException):
+        response = client.execute(request)
     rval = client.read_holding_registers(6, unit=saddress)
     assert rval != 4
 
@@ -59,15 +61,15 @@ def test_wrsreg_protected(client, saddress):
 def test_wrsreg_outofrange_1b(client, saddress):
     request = register_write_message.WriteSingleRegisterRequest(
         SLAVE_NREGS + 1, 04, unit=saddress)
-    response = client.execute(request)
-    assert response.function_code > 0x80
+    with pytest.raises(ModbusServerException):
+        response = client.execute(request)
 
 
 def test_wrsreg_outofrange_2b(client, saddress):
     request = register_write_message.WriteSingleRegisterRequest(
         266, 04, unit=saddress)
-    response = client.execute(request)
-    assert response.function_code > 0x80
+    with pytest.raises(ModbusServerException):
+        response = client.execute(request)
 
 
 def test_wrmregs_2b(client, saddress):
@@ -90,15 +92,15 @@ def test_wrmregs_protected(client, saddress):
 def test_wrmregs_outofrange_start(client, saddress):
     request = register_write_message.WriteMultipleRegistersRequest(
         address=247, values=[100, 100, 100], unit=saddress)
-    response = client.execute(request)
-    assert response.function_code > 0x80
+    with pytest.raises(ModbusServerException):
+        response = client.execute(request)
 
 
 def test_wrmregs_outofrange_end(client, saddress):
     request = register_write_message.WriteMultipleRegistersRequest(
         address=63, values=[100, 100, 100], unit=saddress)
-    response = client.execute(request)
-    assert response.function_code > 0x80
+    with pytest.raises(ModbusServerException):
+        response = client.execute(request)
 
 
 def test_rdregs_hr_1r_1b(client, saddress):
@@ -126,15 +128,15 @@ def test_rdregs_ir_mulr_2b(client, saddress):
 
 
 def test_rdregs_outofrange_start(client, saddress):
-    rval = client.read_holding_registers(247, count=3, unit=saddress)
-    assert rval.function_code > 0x80
-    rval = client.read_holding_registers(259, count=3, unit=saddress)
-    assert rval.function_code > 0x80
+    with pytest.raises(ModbusServerException):
+        rval = client.read_holding_registers(247, count=3, unit=saddress)
+    with pytest.raises(ModbusServerException):
+        rval = client.read_holding_registers(259, count=3, unit=saddress)
 
 
 def test_rdregs_outofrange_end(client, saddress):
-    rval = client.read_holding_registers(63, count=3, unit=saddress)
-    assert rval.function_code > 0x80
+    with pytest.raises(ModbusServerException):
+        rval = client.read_holding_registers(63, count=3, unit=saddress)
 
 
 def test_wrregm(client, saddress):

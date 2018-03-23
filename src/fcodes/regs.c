@@ -73,15 +73,18 @@ void modbus_handler_rdregs(void)
 
 void modbus_handler_wrsreg(void)
 {
-    if (MODBUS_RBYTE(1)){
-        modbus_build_exc_response(0x02);
-        return;
-    }
     uint8_t res = ucdm_set_register(MODBUS_RWORD(1, 2), 
                                     MODBUS_RWORD(3, 4));
-    if (res){
-        modbus_build_exc_response(0x02);
-        return;
+    switch(res){
+        case(0x01):
+            modbus_build_exc_response(0x02);
+            break;
+        case(0x02):
+            modbus_build_exc_response(0x04);
+            break;
+        default:
+            modbus_sm.aduformat->pack();
+            break;
     }
     return;
 }
