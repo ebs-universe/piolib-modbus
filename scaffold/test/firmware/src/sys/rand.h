@@ -19,11 +19,10 @@
 #define RAND_GENERATOR_ASG64        10
 #define RAND_GENERATOR_ENTROPIUM    11
 
-#ifndef RAND_ENTROPY_POOL_LENGTH
-    #define RAND_ENTROPY_POOL_LENGTH    16
-#endif
-
 #if APP_ENABLE_RAND == 1
+    #ifndef RAND_ENTROPY_POOL_LENGTH
+        #define RAND_ENTROPY_POOL_LENGTH    16
+    #endif
 
     void rand_init(void);
     uint8_t rand_byte(void);

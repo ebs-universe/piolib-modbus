@@ -50,7 +50,6 @@
 
 #define APP_ENABLE_BCIF         0
 #define APP_ENABLE_UCDM         1
-#define APP_ENABLE_RAND         0
 
 
 /**
@@ -76,28 +75,35 @@
     /**@}*/ 
 /**@}*/ 
 
+
 /**
  * @name Entropy & Random Configuration
  */
 /**@{*/ 
+    #define APP_ENABLE_RAND           0
     #define APP_ENTROPY_INTFNUM       0
     #define APP_RAND_GENERATOR        1
 /**@}*/
 
-#define APP_ENABLE_SYSTICK            1
-#define APP_SYSTICK_TIMER_INTFNUM     1
-#define APP_SYSTICK_FREQ_Hz           1000
 
-#define APP_ENABLE_RTC                1
+/**
+ * @name Time & Systick Configuration
+ */
+/**@{*/ 
+    #define APP_ENABLE_SYSTICK        1
+    #define APP_SYSTICK_TIMER_INTFNUM 1
+    #define APP_SYSTICK_FREQ_Hz       1000
+    #define APP_ENABLE_RTC            1
+/**@}*/
+
 
 // Core HAL Configuration. Should be calculated instead.
-#define uC_USBCDC_ENABLED           1
-#define uC_USBHID_ENABLED           0
-#define uC_USBMSC_ENABLED           0
-#define uC_USBPHDC_ENABLED          0
+#define uC_USBCDC_ENABLED             1
+#define uC_USBHID_ENABLED             0
+#define uC_USBMSC_ENABLED             0
+#define uC_USBPHDC_ENABLED            0
 
 #define uC_TIMER0_ENABLED             1
-
 #define uC_TIMER1_ENABLED             1
 #define uC_TIMER1_TOP_IRQ_HANDLER     time_systick_handler
 
