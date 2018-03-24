@@ -26,7 +26,7 @@
  * Device Identification Strings
  * 
  * 0x00 VendorName          descriptor_vendor.name
- * 0x01 ProductCode         descriptor_hardware.name
+ * 0x01 ProductCode         descriptor_hardware.revision
  * 0x02 MajorMinorRevision  descriptor_firmware.revision
  * 0x03 VendorUrl           descriptor_vendor.url
  * 0x04 ProductName         descriptor_hardware.name
@@ -129,7 +129,7 @@ static uint8_t _modbus_rddevid_pushobjects(void){
             error = _writeobject(MEDI_OID_VENDORNAME, descriptor_vendor.name);
             if (error) return(error);
         case(MEDI_OID_PRODUCTCODE):
-            error = _writeobject(MEDI_OID_PRODUCTCODE, descriptor_hardware.name);
+            error = _writeobject(MEDI_OID_PRODUCTCODE, descriptor_hardware.revision);
             if (error) return(error);
         case(MEDI_OID_MAJORMINORREV):
             error = _writeobject(MEDI_OID_MAJORMINORREV, descriptor_firmware.revision);

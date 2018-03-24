@@ -27,8 +27,6 @@ import pytest
 from pymodbus.client.sync import ModbusSerialClient
 from pymodbus.pdu import ExceptionResponse
 
-SLAVE_NREGS = 200
-
 
 class ModbusServerException(Exception):
     def __init_(self, response):
@@ -41,6 +39,9 @@ class ModbusClient(ModbusSerialClient):
         if isinstance(result, ExceptionResponse):
             raise ModbusServerException(result)
         return result
+
+
+SLAVE_NREGS = 200
 
 
 @pytest.fixture
