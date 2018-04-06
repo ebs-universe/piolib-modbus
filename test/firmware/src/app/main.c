@@ -1,11 +1,11 @@
 
-
 #include "application.h"
 #include "application_descriptors.h"
 #include "bsp/hal/uc.h"
+#include "bsp/drivers/led/led.h"
 #include "sys/sys.h"
-#include "sys/modbus/modbus.h"
 
+#include "sys/modbus/modbus.h"
 #include <time/sync.h>
 
 #include "test_modbus.h"
@@ -38,17 +38,17 @@ int main(void)
     // Pre-init, and assoicated Housekeeping
     _initialize_interrupts();
     
-    gpio_conf_output(BOARD_GREEN_LED_PORT,BOARD_GREEN_LED_PIN);
-    gpio_conf_output(BOARD_RED_LED_PORT,BOARD_RED_LED_PIN);
-    gpio_set_output_high(BOARD_RED_LED_PORT,BOARD_RED_LED_PIN);
-    gpio_set_output_low(BOARD_GREEN_LED_PORT,BOARD_GREEN_LED_PIN);
+    led_init(BOARD_GREEN_LED_SELECTOR);
+    led_init(BOARD_RED_LED_SELECTOR);
+    led_on(BOARD_RED_LED_SELECTOR);
+    led_off(BOARD_GREEN_LED_SELECTOR);
     
     // uC Core Initialization
     watchdog_hold();
     power_set_full();
-
     clock_set_default();
     global_interrupt_enable();
+    
     usb_init();
     id_init();
     application_descriptors_init();
@@ -57,13 +57,14 @@ int main(void)
     #if APP_ENABLE_BCIF == 1
         bc_init();
     #endif
-    #if APP_ENABLE_UCDM == 1
-        app_ucdm_init();
-    #endif
+    
+    ucdm_init();
+    app_tm_init(UCDM_TIME_BASE_ADDRESS);
+    
     #if APP_ENABLE_MODBUS == 1
         modbus_init(UCDM_MODBUS_BASE_ADDRESS, MODBUS_DEFAULT_DEVICE_ADDRESS);
-        gpio_set_output_low(BOARD_RED_LED_PORT, BOARD_RED_LED_PIN);
-        gpio_set_output_high(BOARD_GREEN_LED_PORT, BOARD_GREEN_LED_PIN);
+        led_off(BOARD_RED_LED_SELECTOR);
+        led_on(BOARD_GREEN_LED_SELECTOR);
     #endif
     modbus_test_init();
     

@@ -24,21 +24,13 @@ Docstring for modbus
 
 import os
 import pytest
-from pymodbus.client.sync import ModbusSerialClient
-from pymodbus.pdu import ExceptionResponse
 
-
-class ModbusServerException(Exception):
-    def __init_(self, response):
-        self.response = response
-
-
-class ModbusClient(ModbusSerialClient):
-    def execute(self, request=None):
-        result = super(ModbusClient, self).execute(request)
-        if isinstance(result, ExceptionResponse):
-            raise ModbusServerException(result)
-        return result
+try:
+    from pymodbus_ebs import ModbusClient
+    from pymodbus_ebs import ModbusServerException
+except ImportError:
+    from pymodbus.client.sync import ModbusSerialClient as ModbusClient
+    ModbusServerException = None
 
 
 SLAVE_NREGS = 200

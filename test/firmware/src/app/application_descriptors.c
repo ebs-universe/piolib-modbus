@@ -1,9 +1,10 @@
 
 
+#include "application.h"
 #include "application_descriptors.h"
 #include <ucdm/descriptors.h>
-#include "bsp/hal/uc/id.h"
 #include "sys/modbus/modbus.h"
+#include "bsp/hal/uc/id.h"
 
 
 const descriptor_vendor_t descriptor_vendor = {
@@ -20,8 +21,8 @@ const descriptor_hardware_t descriptor_hardware = {
 
 
 const descriptor_firmware_t descriptor_firmware = {
-    "FIRMWARE_NAME",
-    "FIRMWARE_REVISION",
+    FIRMWARE_NAME,
+    FIRMWARE_VERSION,
 };
 
 

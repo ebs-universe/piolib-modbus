@@ -46,53 +46,45 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
+#include "app/config.h"
 #include "bsp/hal/uc/types.h"
 
-#define APP_ENABLE_BCIF         0
+#define APP_ENABLE_BCIF         1
 #define APP_ENABLE_UCDM         1
-
 
 /**
  * @name Modbus Interface Configuration
  */
 /**@{*/ 
     /**
-    * @name Modbus Interface Constants
-    */
-    /**@{*/ 
-    #define MODBUS_UART               1
-    #define MODBUS_USBCDC             2
-    /**@}*/
-    /**
     * @name Modbus Interface Configuration
     */
     /**@{*/ 
     #define APP_ENABLE_MODBUS         1
-    #define APP_MODBUSIF_TYPE         MODBUS_USBCDC
+    #define APP_MODBUSIF_TYPE         2
     #define APP_MODBUSIF_INTFNUM      1
     #define APP_MODBUSIF_RXCHUNKSIZE  4
     #define APP_MODBUSIF_TXCHUNKSIZE  1
     /**@}*/ 
 /**@}*/ 
 
-
 /**
  * @name Entropy & Random Configuration
  */
 /**@{*/ 
-    #define APP_ENABLE_RAND           0
     #define APP_ENTROPY_INTFNUM       0
+    #define APP_ENABLE_RAND           1
     #define APP_RAND_GENERATOR        1
 /**@}*/
 
-
 /**
- * @name Time & Systick Configuration
+ * @name Time Configuration
  */
 /**@{*/ 
     #define APP_ENABLE_SYSTICK        1
     #define APP_SYSTICK_TIMER_INTFNUM 1
     #define APP_SYSTICK_FREQ_Hz       1000
+
     #define APP_ENABLE_RTC            1
 /**@}*/
 
@@ -104,6 +96,7 @@
 #define uC_USBPHDC_ENABLED            0
 
 #define uC_TIMER0_ENABLED             1
+
 #define uC_TIMER1_ENABLED             1
 #define uC_TIMER1_TOP_IRQ_HANDLER     time_systick_handler
 

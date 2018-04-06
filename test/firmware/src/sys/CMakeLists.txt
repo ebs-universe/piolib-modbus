@@ -6,6 +6,7 @@ FIND_PACKAGE("ucdm" REQUIRED)
 
 ADD_PLATFORM_LIBRARY(ucdm-if STATIC "ucdm" ucdm_if.c)
 ADD_PLATFORM_LIBRARY(time-if STATIC "hal-uc-timer time" time_if.c)
-ADD_PLATFORM_LIBRARY(rand STATIC "prbs crypto" rand.c)
+ADD_PLATFORM_LIBRARY(rand STATIC "hal-uc-entropy prbs crypto" rand.c)
 
 ADD_SUBDIRECTORY(modbus/src)
+
