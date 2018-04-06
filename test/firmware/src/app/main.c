@@ -4,8 +4,8 @@
 #include "application_descriptors.h"
 #include "bsp/hal/uc.h"
 #include "sys/sys.h"
+#include "sys/modbus/modbus.h"
 
-#include <modbus/modbus.h>
 #include <time/sync.h>
 
 #include "test_modbus.h"
@@ -61,7 +61,7 @@ int main(void)
         app_ucdm_init();
     #endif
     #if APP_ENABLE_MODBUS == 1
-        app_modbus_init();
+        modbus_init(UCDM_MODBUS_BASE_ADDRESS, MODBUS_DEFAULT_DEVICE_ADDRESS);
         gpio_set_output_low(BOARD_RED_LED_PORT, BOARD_RED_LED_PIN);
         gpio_set_output_high(BOARD_GREEN_LED_PORT, BOARD_GREEN_LED_PIN);
     #endif

@@ -1,20 +1,22 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+
+CMAKE_MINIMUM_REQUIRED(VERSION 3.2)
 CMAKE_POLICY(SET CMP0007 NEW)
 
+SET(FIRMWARE_NAME modbus-test-firmware)
 
-PROJECT(hal-modbus-test C)
-SET(hal-modbus-test-hal_VERSION_MAJOR 0)
-SET(hal-modbus-test-hal_VERSION_MINOR 1)
-SET(hal-modbus-test-hal_VERSION_PATCH 0)
-SET(hal-modbus-test-hal_VERSION_TWEAK 0)
-SET(TMP_PROJECT_DESCRIPTION "MODBUS test firmware built on top of the Hardware Abstraction Layers"
-        CACHE STRING "Project Description")
+PROJECT(${FIRMWARE_NAME} C)
 
-SET(DOC_HTML_INSTALL	True)
+SET(PROJECT_DESCRIPTION     "Test firmware for the Modbus library")
+SET(PROJECT_AUTHOR_NAME     "Chintalagiri Shashank")
+SET(PROJECT_AUTHOR_EMAIL    "shashank.chintalagiri@gmail.com")
+SET(PROJECT_LICENSE         "GPLv3")
 
-INCLUDE(doc/instance.cmake)
+SET(PROJECT_VERSION_MAJOR 1)
+SET(PROJECT_VERSION_MINOR 1)
+SET(PROJECT_VERSION_PATCH 0)
+SET(PROJECT_VERSION_TWEAK 0)
 
-INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR} ${INCLUDE_DIRECTORIES}")
+INCLUDE(ebs/exe-conf)
 
 ADD_SUBDIRECTORY(doc)
 ADD_SUBDIRECTORY(bsp)
