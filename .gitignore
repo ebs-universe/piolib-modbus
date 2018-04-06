@@ -1,4 +1,5 @@
 scaffold/resources
+src/config.h
 avr
 msp430
 *.kdev4

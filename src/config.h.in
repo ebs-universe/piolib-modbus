@@ -63,6 +63,10 @@
     #define APP_MODBUSIF_TXCHUNKSIZE        4
 #endif
 
+#ifndef BYTEBUF_TOKEN_MODBUS
+    #define BYTEBUF_TOKEN_MODBUS            0x06
+#endif
+
 
 /**
  * @name Modbus Function Codes Support Inclusion

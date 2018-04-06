@@ -87,6 +87,9 @@ void modbus_if_flush(void);
 #else
 
 #if APP_MODBUSIF_TYPE == MODBUS_UART
+
+#include "bsp/hal/uc/uart.h"
+
 static inline void modbus_if_init(void){
     uart_if[APP_MODBUSIF_INTFNUM]->state->overrun_counter = &modbus_bus_char_overrun_cnt;
     uart_init(APP_MODBUSIF_INTFNUM);
@@ -117,6 +120,9 @@ static inline void modbus_if_flush(void){
     return;
 }
 #elif APP_MODBUSIF_TYPE == MODBUS_USBCDC
+
+#include "bsp/hal/uc/usbcdc.h"
+
 static inline void modbus_if_init(void){
     return;
 }
