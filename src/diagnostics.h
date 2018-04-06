@@ -33,10 +33,6 @@
 
 #include<bytebuf/bytebuf.h>
 
-
-extern uint16_t *const modbus_diagnostic_register_p;
-extern uint8_t  *const modbus_exception_status_p;
-
 /**
  * @name Diagnostic Counters
  */

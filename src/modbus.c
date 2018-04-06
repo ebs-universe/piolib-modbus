@@ -31,6 +31,7 @@
 
 #include <bytebuf/bytebuf.h>
 #include <ucdm/ucdm.h>
+#include <ucdm/descriptor.h>
 #include <time/time.h>
 #include <time/cron.h>
 
@@ -60,6 +61,19 @@ modbus_sm_t modbus_sm = {
         &modbus_rxtxbuf[0],
 };
 
+uint16_t * modbus_address_p;
+
+/** @brief UUID Library Version Descriptor */
+static descriptor_custom_t modbus_descriptor = {DESCRIPTOR_TAG_LIBVERSION, 
+    sizeof(MODBUS_VERSION), DESCRIPTOR_ACCTYPE_PTR, {MODBUS_VERSION}, NULL};
+
+    
+void modbus_install_descriptor(void)
+{
+    descriptor_install(&modbus_descriptor);
+}
+
+
 void modbus_reset_sm(void){
     modbus_sm.rxtxlen = 0;
     modbus_sm.state = MODBUS_ST_IDLE;
@@ -83,8 +97,7 @@ static inline uint16_t _modbus_init_interface(uint16_t ucdm_next_address,
 static inline uint16_t _modbus_init_interface(uint16_t ucdm_next_address, 
                                               uint16_t tmodbus_address){
     modbus_if_init();
-    modbus_ucdm_address = ucdm_next_address;
-    modbus_address_p = &(ucdm_register[modbus_ucdm_address].data);
+    modbus_address_p = &(ucdm_register[ucdm_next_address].data);
     modbus_set_address(tmodbus_address);
     return ucdm_next_address++;
 }
@@ -131,7 +144,7 @@ void modbus_state_machine(void){
             if (tvar8){
                 uvar8 = modbus_if_unhandled_rxb();
                 if (uvar8 < tvar8){
-                    if (uvar8 >= modbus_if_rxbuf_chunksize){
+                    if (uvar8 >= APP_MODBUSIF_RXCHUNKSIZE){
                         tvar8 = uvar8;
                     }
                     else{

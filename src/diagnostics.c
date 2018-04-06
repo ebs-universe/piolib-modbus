@@ -31,8 +31,13 @@
 
 
 #include<bytebuf/bytebuf.h>
+#include<ucdm/ucdm.h>
 
 #include "diagnostics.h"
+
+
+uint16_t *const modbus_diagnostic_register_p =  &ucdm_diagnostic_register;
+uint8_t  *const modbus_exception_status_p =     &ucdm_exception_status;
 
 
 /**

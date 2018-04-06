@@ -1,0 +1,154 @@
+/* 
+   Copyright (c)
+     (c) 2015-2016 Chintalagiri Shashank, Quazar Technologies Pvt. Ltd.
+   
+   This file is part of
+   Embedded bootstraps : modbus library
+   
+   This library is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published
+   by the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/
+
+/**
+ * @file config.h
+ * @brief Configuration of Function Code Handler Inclusion.
+ */
+
+
+#ifndef MODBUS_CONFIG_H
+#define MODBUS_CONFIG_H
+
+@MODBUS_APPLICATION_INCLUDE@
+
+#define MODBUS_VERSION_MAJOR                "@PROJECT_VERSION_MAJOR@"
+#define MODBUS_VERSION_MINOR                "@PROJECT_VERSION_MINOR@"
+#define MODBUS_VERSION_PATCH                "@PROJECT_VERSION_PATCH@"
+#define MODBUS_VERSION_TWEAK                "@PROJECT_VERSION_TWEAK@"
+#define MODBUS_VERSION                      "modbus @PROJECT_VERSION@"
+
+
+#define MODBUS_ADUFORMAT_UART               0x01
+
+#ifndef MODBUS_ADU_FORMAT
+    #define MODBUS_ADU_FORMAT               @MODBUS_ADU_FORMAT@
+#endif
+
+#ifndef MODBUS_ADU_MAXLEN
+    #define MODBUS_ADU_MAXLEN               @MODBUS_ADU_MAXLEN@
+#endif
+
+#ifndef MODBUS_DEFAULT_DEVICE_ADDRESS
+    #define MODBUS_DEFAULT_DEVICE_ADDRESS   @MODBUS_DEFAULT_DEVICE_ADDRESS@
+#endif
+
+#ifndef MODBUS_USE_TIMEOUTS
+    #define MODBUS_USE_TIMEOUTS             @MODBUS_USE_TIMEOUTS@
+#endif
+
+#ifndef APP_MODBUSIF_RXCHUNKSIZE
+    #define APP_MODBUSIF_RXCHUNKSIZE        4
+#endif
+
+#ifndef APP_MODBUSIF_TXCHUNKSIZE
+    #define APP_MODBUSIF_TXCHUNKSIZE        4
+#endif
+
+
+/**
+ * @name Modbus Function Codes Support Inclusion
+ */
+/**@{*/
+#ifndef MB_SUPPORT_FC_RD_COILS
+    #define MB_SUPPORT_FC_RD_COILS          @MB_SUPPORT_FC_RD_COILS@
+#endif
+
+#ifndef MB_SUPPORT_FC_RD_INPUTS
+    #define MB_SUPPORT_FC_RD_INPUTS         @MB_SUPPORT_FC_RD_INPUTS@
+#endif
+
+#ifndef MB_SUPPORT_FC_RD_HREG
+    #define MB_SUPPORT_FC_RD_HREG           @MB_SUPPORT_FC_RD_HREG@
+#endif 
+
+#ifndef MB_SUPPORT_FC_RD_IREG
+    #define MB_SUPPORT_FC_RD_IREG           @MB_SUPPORT_FC_RD_IREG@
+#endif
+
+#ifndef MB_SUPPORT_FC_WR_SCOIL
+    #define MB_SUPPORT_FC_WR_SCOIL          @MB_SUPPORT_FC_WR_SCOIL@
+#endif
+
+#ifndef MB_SUPPORT_FC_WR_SREG
+    #define MB_SUPPORT_FC_WR_SREG           @MB_SUPPORT_FC_WR_SREG@
+#endif
+
+#ifndef MB_SUPPORT_FC_RD_EXCST
+    #define MB_SUPPORT_FC_RD_EXCST          @MB_SUPPORT_FC_RD_EXCST@
+#endif
+
+#ifndef MB_SUPPORT_FC_GT_CECNT
+    #define MB_SUPPORT_FC_GT_CECNT          @MB_SUPPORT_FC_GT_CECNT@  
+#endif
+
+#ifndef MB_SUPPORT_FC_GT_CELOG
+    #define MB_SUPPORT_FC_GT_CELOG          @MB_SUPPORT_FC_GT_CELOG@  
+#endif
+
+#ifndef MB_SUPPORT_FC_WR_MCOILS
+    #define MB_SUPPORT_FC_WR_MCOILS         @MB_SUPPORT_FC_WR_MCOILS@ 
+#endif
+
+#ifndef MB_SUPPORT_FC_WR_MREGS
+    #define MB_SUPPORT_FC_WR_MREGS          @MB_SUPPORT_FC_WR_MREGS@ 
+#endif
+
+#ifndef MB_SUPPORT_FC_REP_SID
+    #define MB_SUPPORT_FC_REP_SID           @MB_SUPPORT_FC_REP_SID@
+#endif
+
+#ifndef MB_SUPPORT_FC_RD_FREC
+    #define MB_SUPPORT_FC_RD_FREC           @MB_SUPPORT_FC_RD_FREC@ 
+#endif 
+
+#ifndef MB_SUPPORT_FC_WR_FREC
+    #define MB_SUPPORT_FC_WR_FREC           @MB_SUPPORT_FC_WR_FREC@ 
+#endif
+
+#ifndef MB_SUPPORT_FC_WR_REGM
+    #define MB_SUPPORT_FC_WR_REGM           @MB_SUPPORT_FC_WR_REGM@
+#endif
+
+#ifndef MB_SUPPORT_FC_RW_MREGS
+    #define MB_SUPPORT_FC_RW_MREGS          @MB_SUPPORT_FC_RW_MREGS@ 
+#endif
+
+#ifndef MB_SUPPORT_FC_RD_FIFOQ
+    #define MB_SUPPORT_FC_RD_FIFOQ          @MB_SUPPORT_FC_RD_FIFOQ@
+#endif
+
+#ifndef MB_SUPPORT_FC_EIT
+    #define MB_SUPPORT_FC_EIT               @MB_SUPPORT_FC_EIT@
+#endif 
+#ifndef MB_SUPPORT_SFC_EIT_CANOPEN
+        #define MB_SUPPORT_SFC_EIT_CANOPEN  @MB_SUPPORT_SFC_EIT_CANOPEN@
+#endif
+#ifndef MB_SUPPORT_SFC_EIT_RDDEVID
+        #define MB_SUPPORT_SFC_EIT_RDDEVID  @MB_SUPPORT_SFC_EIT_RDDEVID@
+#endif
+#ifndef MB_SUPPORT_FC_DIAGNOSTICS
+    #define MB_SUPPORT_FC_DIAGNOSTICS       @MB_SUPPORT_FC_DIAGNOSTICS@
+#endif
+
+/**@}*/ 
+
+#endif

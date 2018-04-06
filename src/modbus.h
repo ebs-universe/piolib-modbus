@@ -75,31 +75,12 @@
 
 #include <stdint.h>
 #include "config.h"
+#include "interface.h"
 #include "fcodes/common.h"
 
 #define MODBUS_TIMEOUT_INTERNAL         0
 #define MODBUS_TIMEOUT_CRON             1  // Not currently implemented
 #define MODBUS_TIMEOUT_TYPE             MODBUS_TIMEOUT_INTERNAL
-
-
-/**
- * @name Modbus Configuration Containers
- * 
- * Most of the containers defined here should be defined in the application
- * layer as per the requirements of the application. 
- */
-/**@{*/ 
-
-/** 
- *\brief MODBUS Interface Constant. 
- */
-extern const uint8_t modbus_if_rxbuf_chunksize;
-
-/** 
- *\brief MODBUS Interface Constant. 
- */
-extern const uint8_t modbus_if_txbuf_chunksize;
-/**@}*/ 
 
 /**
  * @name Modbus State Machine State Variable States
@@ -163,8 +144,7 @@ typedef struct MODBUS_CTRANS_t
 }modbus_ctrans_t;
 
 
-uint16_t * modbus_address_p;
-uint16_t modbus_ucdm_address;
+extern uint16_t * modbus_address_p;
 extern modbus_sm_t modbus_sm;
 extern modbus_ctrans_t modbus_ctrans;
 extern const modbus_aduformat_t modbus_aduformat;
@@ -179,6 +159,7 @@ extern uint8_t modbus_rxtxbuf[MODBUS_ADU_MAXLEN];
 /**@{*/ 
 
 uint16_t modbus_init(uint16_t ucdm_next_address, uint16_t tmodbus_address);
+void modbus_install_descriptor(void);
 void modbus_set_address(uint16_t tmodbus_address);
 void modbus_reset_sm(void);
 void modbus_reset_all(void);
@@ -196,49 +177,6 @@ void modbus_state_machine(void);
 uint8_t modbus_process_command(void);
 extern uint16_t modbus_bus_char_overrun_cnt;
 
-/**@}*/ 
-
-/**
- * @name Modbus Application Dependent External API Functions
- * 
- * These functions related to hardware or application-specific interfaces and 
- * must be provided by the application, probably within the subsystem layer. 
- * 
- * The function declarations are written to be transport and platform agnostic. 
- * An unfortunate side-effect of this is that the functions will have to be 
- * real ones and cannot simply be inlined. This will result in an unavoidable 
- * performance hit which is not presently quantified.
- * 
- * The modbus library is thus implemented here to first copy out as many bytes 
- * as it can into a modbus library buffer, within which the commmand may 
- * then be processed and handled. In applications requiring higher modbus 
- * command throughput, this intermediate buffer should be bypassed and the 
- * modbus commands handled directly against the bytebuf. The best approach to 
- * do this would be for the application to provide (and use) it's own modbus 
- * state machine implementation, using the sources for the one implemented 
- * here as a guide.
- * 
- * The implementation here does not use this approach to avoid the assumption
- * of the presence of bytebufs at the underlying hardware interface driver. 
- * This assumption would probably make the implementation incompatible with 
- * regular buffers or other interface types. This way, the protocol library 
- * is well separated from the hardware driver and we rely on the HAL and
- * subsystem layers to sort out how to perform specific, well defined tasks 
- * and just link against them.
- * 
- */
-/**@{*/ 
-extern void modbus_if_init(void);
-
-extern uint8_t modbus_if_unhandled_rxb(void);
-extern uint8_t modbus_if_getc(void);
-extern uint8_t modbus_if_read(void *buffer, uint8_t len);
-
-extern uint8_t modbus_if_reqlock(uint8_t len);
-extern uint8_t modbus_if_rellock(void);
-extern uint8_t modbus_if_putc(uint8_t byte);
-extern uint8_t modbus_if_write(void *buffer, uint8_t len);
-extern void modbus_if_flush(void);
 /**@}*/ 
 
 /**

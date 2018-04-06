@@ -89,8 +89,8 @@ void modbus_uart_adu_write(void){
     if (tvar8 >= modbus_sm.rxtxlen){
         tvar8 = modbus_sm.rxtxlen;
     }
-    else if(tvar8 > modbus_if_txbuf_chunksize){
-        tvar8 = modbus_if_txbuf_chunksize;
+    else if(tvar8 > APP_MODBUSIF_TXCHUNKSIZE){
+        tvar8 = APP_MODBUSIF_TXCHUNKSIZE;
     }
     else{
         tvar8 = 0;
