@@ -1,7 +1,9 @@
-scaffold/resources
+doc/resources
 src/config.h
 avr
 msp430
+test/firmware/msp430
+test/firmware/doc
 *.kdev4
 *.kdev_include_paths
 *.idea
