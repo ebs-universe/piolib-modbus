@@ -54,25 +54,63 @@
  */
 static const modbus_fcode_handler_t *modbus_fcode_handlers[]={
     &_unimpl_handler,
+#if MODBUS_FRAME_UNSUPPORTED || MB_SUPPORT_FC_RD_COILS
     &_rdcoils_handler,
+#endif
+#if MODBUS_FRAME_UNSUPPORTED || MB_SUPPORT_FC_RD_INPUTS
     &_rdinputs_handler,
+#endif
+#if MODBUS_FRAME_UNSUPPORTED || MB_SUPPORT_FC_RD_HREG
     &_rdhreg_handler,
+#endif
+#if MODBUS_FRAME_UNSUPPORTED || MB_SUPPORT_FC_RD_IREG
     &_rdireg_handler,
+#endif
+#if MODBUS_FRAME_UNSUPPORTED || MB_SUPPORT_FC_WR_SCOIL
     &_wrscoil_handler,
+#endif
+#if MODBUS_FRAME_UNSUPPORTED || MB_SUPPORT_FC_WR_SREG
     &_wrsreg_handler,
+#endif
+#if MODBUS_FRAME_UNSUPPORTED || MB_SUPPORT_FC_RD_EXCST
     &_rdexcst_handler,
+#endif
+#if MODBUS_FRAME_UNSUPPORTED || MB_SUPPORT_FC_DIAGNOSTICS
     &_diagnostics_handler,
+#endif
+#if MODBUS_FRAME_UNSUPPORTED || MB_SUPPORT_FC_GT_CECNT
     &_gtcecnt_handler,
+#endif
+#if MODBUS_FRAME_UNSUPPORTED || MB_SUPPORT_FC_GT_CELOG
     &_gtcelog_handler,
+#endif
+#if MODBUS_FRAME_UNSUPPORTED || MB_SUPPORT_FC_WR_MCOILS
     &_wrmcoils_handler,
+#endif
+#if MODBUS_FRAME_UNSUPPORTED || MB_SUPPORT_FC_WR_MREGS
     &_wrmregs_handler,
+#endif
+#if MODBUS_FRAME_UNSUPPORTED || MB_SUPPORT_FC_REP_SID
     &_repsid_handler,
+#endif
+#if MODBUS_FRAME_UNSUPPORTED || MB_SUPPORT_FC_RD_FREC
     &_rdfrec_handler,
+#endif
+#if MODBUS_FRAME_UNSUPPORTED || MB_SUPPORT_FC_WR_FREC
     &_wrfrec_handler,
+#endif
+#if MODBUS_FRAME_UNSUPPORTED || MB_SUPPORT_FC_WR_REGM
     &_wrregm_handler,
+#endif
+#if MODBUS_FRAME_UNSUPPORTED || MB_SUPPORT_FC_RW_MREGS
     &_rwmregs_handler,
+#endif
+#if MODBUS_FRAME_UNSUPPORTED || MB_SUPPORT_FC_RD_FIFOQ    
     &_rdfifoq_handler,
+#endif
+#if MODBUS_FRAME_UNSUPPORTED || MB_SUPPORT_FC_EIT
     &_eit_handler,
+#endif
 };
 
 

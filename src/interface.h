@@ -28,18 +28,48 @@
 
 #ifndef MODBUS_INTERFACE_H
 #define MODBUS_INTERFACE_H
-
-/**
-* @name Modbus Interface Constants
-*/
-/**@{*/ 
-#define MODBUS_UART               1
-#define MODBUS_USBCDC             2
-/**@}*/
     
 #include "config.h"
+#include "modbus.h"
 
-#ifndef APP_MODBUSIF_TYPE
+#if MODBUS_PLUGGABLE_TRANSPORTS == 1
+
+#if APP_MODBUS_TRANSPORT == MODBUS_APPTRANSPORT
+    extern pluggable_transport_t ptransport_modbus;
+#endif
+
+static inline void modbus_if_init(void){
+    // TODO Figure out overrun counter installation
+    return modbus_sm.transport->init(modbus_sm.intfnum);
+}
+
+static inline uint8_t modbus_if_unhandled_rxb(void){
+    return modbus_sm.transport->unhandled_rxb(modbus_sm.intfnum);
+}
+
+static inline uint8_t modbus_if_read(void *buffer, uint8_t len){
+    return modbus_sm.transport->read(modbus_sm.intfnum, buffer, len);
+}
+
+static inline uint8_t modbus_if_reqlock(uint8_t len){
+    return modbus_sm.transport->reqlock(modbus_sm.intfnum, len, BYTEBUF_TOKEN_MODBUS);
+}
+
+static inline uint8_t modbus_if_rellock(void){
+    return modbus_sm.transport->rellock(modbus_sm.intfnum, BYTEBUF_TOKEN_MODBUS);
+}
+
+static inline uint8_t modbus_if_write(void *buffer, uint8_t len){
+    return modbus_sm.transport->write(modbus_sm.intfnum, buffer, len, BYTEBUF_TOKEN_MODBUS);
+}
+
+static inline void modbus_if_flush(void){
+    return modbus_sm.transport->flush(modbus_sm.intfnum);
+}
+
+#else
+
+#if APP_MODBUS_TRANSPORT == MODBUS_APPTRANSPORT
 
 /**
  * @name Modbus Application Dependent External API Functions
@@ -60,7 +90,7 @@
  * do this would be for the application to provide (and use) it's own modbus 
  * state machine implementation, using the sources for the one implemented 
  * here as a guide.
- * 
+ * MODBUS_DEFAULT_TRANSPORT
  * The implementation here does not use this approach to avoid the assumption
  * of the presence of bytebufs at the underlying hardware interface driver. 
  * This assumption would probably make the implementation incompatible with 
@@ -72,54 +102,42 @@
  */
 /**@{*/ 
 void modbus_if_init(void);
-
 uint8_t modbus_if_unhandled_rxb(void);
-uint8_t modbus_if_getc(void);
-uint8_t modbus_if_read(void *buffer, uint8_t len);
-
+uint8_t modbus_if_read(uint8_t *buffer, uint8_t len);
 uint8_t modbus_if_reqlock(uint8_t len);
 uint8_t modbus_if_rellock(void);
-uint8_t modbus_if_putc(uint8_t byte);
-uint8_t modbus_if_write(void *buffer, uint8_t len);
+uint8_t modbus_if_write(uint8_t *buffer, uint8_t len);
 void modbus_if_flush(void);
 /**@}*/ 
 
-#else
-
-#if APP_MODBUSIF_TYPE == MODBUS_UART
+#elif APP_MODBUS_TRANSPORT == MODBUS_UART
 
 #include "bsp/hal/uc/uart.h"
 
 static inline void modbus_if_init(void){
-    uart_if[APP_MODBUSIF_INTFNUM]->state->overrun_counter = &modbus_bus_char_overrun_cnt;
-    uart_init(APP_MODBUSIF_INTFNUM);
+    uart_if[APP_MODBUS_INTFNUM]->state->overrun_counter = &modbus_bus_char_overrun_cnt;
+    uart_init(APP_MODBUS_INTFNUM);
 }
 static inline uint8_t modbus_if_unhandled_rxb(void){
-    return uart_population_rxb(APP_MODBUSIF_INTFNUM);
+    return uart_population_rxb(APP_MODBUS_INTFNUM);
 }
-static inline uint8_t modbus_if_getc(void){
-    return uart_getc(APP_MODBUSIF_INTFNUM);
-}
-static inline uint8_t modbus_if_read(void *buffer, uint8_t len){
-    return uart_read(APP_MODBUSIF_INTFNUM, buffer, len);
+static inline uint8_t modbus_if_read(uint8_t *buffer, uint8_t len){
+    return uart_read(APP_MODBUS_INTFNUM, buffer, len);
 }
 static inline uint8_t modbus_if_reqlock(uint8_t len){
-    return uart_reqlock(APP_MODBUSIF_INTFNUM, len, BYTEBUF_TOKEN_MODBUS);
+    return uart_reqlock(APP_MODBUS_INTFNUM, len, BYTEBUF_TOKEN_MODBUS);
 }
 static inline uint8_t modbus_if_rellock(void){
-    return uart_rellock(APP_MODBUSIF_INTFNUM, BYTEBUF_TOKEN_MODBUS);
+    return uart_rellock(APP_MODBUS_INTFNUM, BYTEBUF_TOKEN_MODBUS);
 }
-static inline uint8_t modbus_if_putc(uint8_t byte){
-    return uart_putc(APP_MODBUSIF_INTFNUM, byte, BYTEBUF_TOKEN_MODBUS, 0x00);
-}
-static inline uint8_t modbus_if_write(void *buffer, uint8_t len){
-    return uart_write(APP_MODBUSIF_INTFNUM, buffer, len, BYTEBUF_TOKEN_MODBUS);
+static inline uint8_t modbus_if_write(uint8_t *buffer, uint8_t len){
+    return uart_write(APP_MODBUS_INTFNUM, buffer, len, BYTEBUF_TOKEN_MODBUS);
 }
 static inline void modbus_if_flush(void){
-    uart_send_flush(APP_MODBUSIF_INTFNUM);
+    uart_send_flush(APP_MODBUS_INTFNUM);
     return;
 }
-#elif APP_MODBUSIF_TYPE == MODBUS_USBCDC
+#elif APP_MODBUS_TRANSPORT == MODBUS_USBCDC
 
 #include "bsp/hal/uc/usbcdc.h"
 
@@ -127,30 +145,25 @@ static inline void modbus_if_init(void){
     return;
 }
 static inline uint8_t modbus_if_unhandled_rxb(void){
-    return usbcdc_population_rxb(APP_MODBUSIF_INTFNUM);
+    return usbcdc_population_rxb(APP_MODBUS_INTFNUM);
 }
-static inline uint8_t modbus_if_getc(void){
-    return usbcdc_getc(APP_MODBUSIF_INTFNUM);
-}
-static inline uint8_t modbus_if_read(void *buffer, uint8_t len){
-    return usbcdc_read(APP_MODBUSIF_INTFNUM, buffer, len);
+static inline uint8_t modbus_if_read(uint8_t *buffer, uint8_t len){
+    return usbcdc_read(APP_MODBUS_INTFNUM, buffer, len);
 }
 static inline uint8_t modbus_if_reqlock(uint8_t len){
-    return usbcdc_reqlock(APP_MODBUSIF_INTFNUM, len, BYTEBUF_TOKEN_MODBUS);
+    return usbcdc_reqlock(APP_MODBUS_INTFNUM, len, BYTEBUF_TOKEN_MODBUS);
 }
 static inline uint8_t modbus_if_rellock(void){
-    return usbcdc_rellock(APP_MODBUSIF_INTFNUM, BYTEBUF_TOKEN_MODBUS);
+    return usbcdc_rellock(APP_MODBUS_INTFNUM, BYTEBUF_TOKEN_MODBUS);
 }
-static inline uint8_t modbus_if_putc(uint8_t byte){
-    return usbcdc_putc(APP_MODBUSIF_INTFNUM, byte, BYTEBUF_TOKEN_MODBUS, 0x00);
-}
-static inline uint8_t modbus_if_write(void *buffer, uint8_t len){
-    return usbcdc_write(APP_MODBUSIF_INTFNUM, buffer, len, BYTEBUF_TOKEN_MODBUS);
+static inline uint8_t modbus_if_write(uint8_t *buffer, uint8_t len){
+    return usbcdc_write(APP_MODBUS_INTFNUM, buffer, len, BYTEBUF_TOKEN_MODBUS);
 }
 static inline void modbus_if_flush(void){
-    usbcdc_send_flush(APP_MODBUSIF_INTFNUM);
+    usbcdc_send_flush(APP_MODBUS_INTFNUM);
     return;
 }
 #endif
+
 #endif
 #endif

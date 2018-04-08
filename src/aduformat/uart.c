@@ -33,6 +33,7 @@
 #include <ucdm/ucdm.h>
 
 #include "../modbus.h"
+#include "../interface.h"
 #include "../diagnostics.h"
 #include "uart.h"
 
@@ -89,8 +90,8 @@ void modbus_uart_adu_write(void){
     if (tvar8 >= modbus_sm.rxtxlen){
         tvar8 = modbus_sm.rxtxlen;
     }
-    else if(tvar8 > APP_MODBUSIF_TXCHUNKSIZE){
-        tvar8 = APP_MODBUSIF_TXCHUNKSIZE;
+    else if(tvar8 > MODBUS_TXCHUNKSIZE){
+        tvar8 = MODBUS_TXCHUNKSIZE;
     }
     else{
         tvar8 = 0;

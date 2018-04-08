@@ -38,9 +38,12 @@
 #include "modbus.h"
 #include "dispatch.h"
 #include "diagnostics.h"
+#include "interface.h"
 
 #include "aduformat/uart.h"
 #include "fcodes/crlen.h"
+#include "bsp/hal/uc/usbcdc.h"
+#include "bsp/hal/uc/uart.h"
 
 modbus_ctrans_t modbus_ctrans;
 uint8_t modbus_rxtxbuf[MODBUS_ADU_MAXLEN];
@@ -54,6 +57,16 @@ modbus_sm_t modbus_sm = {
     #if MODBUS_ADU_FORMAT == MODBUS_ADUFORMAT_UART
         &modbus_aduformat_uart,
     #endif
+    #if MODBUS_PLUGGABLE_TRANSPORTS == 1
+        #if APP_MODBUS_TRANSPORT == MODBUS_APPTRANSPORT
+        &ptransport_modbus,
+        #elif APP_MODBUS_TRANSPORT == MODBUS_USBCDC
+        &ptransport_usbcdc,
+        #elif APP_MODBUS_TRANSPORT == MODBUS_UART
+        &ptransport_uart,
+        #endif
+    #endif 
+        APP_MODBUS_INTFNUM,
         MODBUS_ST_PREINIT,
         MODBUS_OUT_NORMAL,
         0,
@@ -144,7 +157,7 @@ void modbus_state_machine(void){
             if (tvar8){
                 uvar8 = modbus_if_unhandled_rxb();
                 if (uvar8 < tvar8){
-                    if (uvar8 >= APP_MODBUSIF_RXCHUNKSIZE){
+                    if (uvar8 >= MODBUS_RXCHUNKSIZE){
                         tvar8 = uvar8;
                     }
                     else{
