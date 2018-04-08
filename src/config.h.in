@@ -36,8 +36,44 @@
 #define MODBUS_VERSION_TWEAK                "@PROJECT_VERSION_TWEAK@"
 #define MODBUS_VERSION                      "modbus @PROJECT_VERSION@"
 
+/**
+* @name Modbus Interface Constants
+*/
+/**@{*/
+#define MODBUS_APPTRANSPORT                 0
+#define MODBUS_UART                         1
+#define MODBUS_USBCDC                       2
 
 #define MODBUS_ADUFORMAT_UART               0x01
+/**@}*/
+
+
+#ifndef APP_MODBUS_TRANSPORT
+    #define APP_MODBUS_TRANSPORT            @APP_MODBUS_TRANSPORT@
+#endif
+
+#ifndef APP_MODBUS_INTFNUM
+    #define APP_MODBUS_INTFNUM              @APP_MODBUS_INTFNUM@
+#endif
+
+#ifndef MODBUS_PLUGGABLE_TRANSPORTS    
+    #define MODBUS_PLUGGABLE_TRANSPORTS     @MODBUS_PLUGGABLE_TRANSPORTS@
+#endif
+
+#ifndef MODBUS_RXCHUNKSIZE
+    #define MODBUS_RXCHUNKSIZE              4
+#endif
+
+#ifndef MODBUS_TXCHUNKSIZE
+    #define MODBUS_TXCHUNKSIZE              1
+#endif
+
+#ifndef BYTEBUF_TOKEN_MODBUS
+    #define BYTEBUF_TOKEN_MODBUS            0x06
+#endif
+
+
+
 
 #ifndef MODBUS_ADU_FORMAT
     #define MODBUS_ADU_FORMAT               @MODBUS_ADU_FORMAT@
@@ -55,18 +91,9 @@
     #define MODBUS_USE_TIMEOUTS             @MODBUS_USE_TIMEOUTS@
 #endif
 
-#ifndef APP_MODBUSIF_RXCHUNKSIZE
-    #define APP_MODBUSIF_RXCHUNKSIZE        4
+#ifndef MODBUS_FRAME_UNSUPPORTED
+    #define MODBUS_FRAME_UNSUPPORTED        1
 #endif
-
-#ifndef APP_MODBUSIF_TXCHUNKSIZE
-    #define APP_MODBUSIF_TXCHUNKSIZE        4
-#endif
-
-#ifndef BYTEBUF_TOKEN_MODBUS
-    #define BYTEBUF_TOKEN_MODBUS            0x06
-#endif
-
 
 /**
  * @name Modbus Function Codes Support Inclusion

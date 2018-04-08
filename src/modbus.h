@@ -74,8 +74,8 @@
 #define MODBUS_H
 
 #include <stdint.h>
+#include <platform/transport.h>
 #include "config.h"
-#include "interface.h"
 #include "fcodes/common.h"
 
 #define MODBUS_TIMEOUT_INTERNAL         0
@@ -129,6 +129,10 @@ typedef struct MODBUS_ADUFORMAT_t
 typedef struct MODBUS_SM_t
 {
     const modbus_aduformat_t * aduformat;
+#if MODBUS_PLUGGABLE_TRANSPORTS == 1
+    const pluggable_transport_t * transport;
+#endif 
+    uint8_t intfnum;
     uint8_t state;
     uint8_t silent;
     uint8_t rxtxlen;
