@@ -61,10 +61,8 @@
     */
     /**@{*/ 
     #define APP_ENABLE_MODBUS         1
-    #define APP_MODBUSIF_TYPE         2
-    #define APP_MODBUSIF_INTFNUM      1
-    #define APP_MODBUSIF_RXCHUNKSIZE  4
-    #define APP_MODBUSIF_TXCHUNKSIZE  1
+    #define APP_MODBUS_INTFNUM        1
+    #define APP_MODBUS_TRANSPORT      2
     /**@}*/ 
 /**@}*/ 
 
