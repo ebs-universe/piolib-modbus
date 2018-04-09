@@ -77,8 +77,9 @@ modbus_sm_t modbus_sm = {
 uint16_t * modbus_address_p;
 
 /** @brief UUID Library Version Descriptor */
-static descriptor_custom_t modbus_descriptor = {DESCRIPTOR_TAG_LIBVERSION, 
-    sizeof(MODBUS_VERSION), DESCRIPTOR_ACCTYPE_PTR, {MODBUS_VERSION}, NULL};
+static descriptor_custom_t modbus_descriptor = {NULL, 
+    DESCRIPTOR_TAG_LIBVERSION, sizeof(MODBUS_VERSION), 
+    DESCRIPTOR_ACCTYPE_PTR, {MODBUS_VERSION}};
 
     
 void modbus_install_descriptor(void)
