@@ -131,8 +131,8 @@ typedef struct MODBUS_SM_t
     const modbus_aduformat_t * aduformat;
 #if MODBUS_PLUGGABLE_TRANSPORTS == 1
     const pluggable_transport_t * transport;
-#endif 
     uint8_t intfnum;
+#endif 
     uint8_t state;
     uint8_t silent;
     uint8_t rxtxlen;

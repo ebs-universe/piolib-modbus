@@ -115,26 +115,26 @@ void modbus_if_flush(void);
 #include "bsp/hal/uc/uart.h"
 
 static inline void modbus_if_init(void){
-    uart_if[APP_MODBUS_INTFNUM]->state->overrun_counter = &modbus_bus_char_overrun_cnt;
-    uart_init(APP_MODBUS_INTFNUM);
+    uart_if[MODBUS_TRANSPORT_UART_INTFNUM]->state->overrun_counter = &modbus_bus_char_overrun_cnt;
+    uart_init(MODBUS_TRANSPORT_UART_INTFNUM);
 }
 static inline uint8_t modbus_if_unhandled_rxb(void){
-    return uart_population_rxb(APP_MODBUS_INTFNUM);
+    return uart_population_rxb(MODBUS_TRANSPORT_UART_INTFNUM);
 }
 static inline uint8_t modbus_if_read(uint8_t *buffer, uint8_t len){
-    return uart_read(APP_MODBUS_INTFNUM, buffer, len);
+    return uart_read(MODBUS_TRANSPORT_UART_INTFNUM, buffer, len);
 }
 static inline uint8_t modbus_if_reqlock(uint8_t len){
-    return uart_reqlock(APP_MODBUS_INTFNUM, len, BYTEBUF_TOKEN_MODBUS);
+    return uart_reqlock(MODBUS_TRANSPORT_UART_INTFNUM, len, BYTEBUF_TOKEN_MODBUS);
 }
 static inline uint8_t modbus_if_rellock(void){
-    return uart_rellock(APP_MODBUS_INTFNUM, BYTEBUF_TOKEN_MODBUS);
+    return uart_rellock(MODBUS_TRANSPORT_UART_INTFNUM, BYTEBUF_TOKEN_MODBUS);
 }
 static inline uint8_t modbus_if_write(uint8_t *buffer, uint8_t len){
-    return uart_write(APP_MODBUS_INTFNUM, buffer, len, BYTEBUF_TOKEN_MODBUS);
+    return uart_write(MODBUS_TRANSPORT_UART_INTFNUM, buffer, len, BYTEBUF_TOKEN_MODBUS);
 }
 static inline void modbus_if_flush(void){
-    uart_send_flush(APP_MODBUS_INTFNUM);
+    uart_send_flush(MODBUS_TRANSPORT_UART_INTFNUM);
     return;
 }
 #elif APP_MODBUS_TRANSPORT == MODBUS_USBCDC
@@ -145,22 +145,22 @@ static inline void modbus_if_init(void){
     return;
 }
 static inline uint8_t modbus_if_unhandled_rxb(void){
-    return usbcdc_population_rxb(APP_MODBUS_INTFNUM);
+    return usbcdc_population_rxb(MODBUS_TRANSPORT_USBCDC_INTFNUM);
 }
 static inline uint8_t modbus_if_read(uint8_t *buffer, uint8_t len){
-    return usbcdc_read(APP_MODBUS_INTFNUM, buffer, len);
+    return usbcdc_read(MODBUS_TRANSPORT_USBCDC_INTFNUM, buffer, len);
 }
 static inline uint8_t modbus_if_reqlock(uint8_t len){
-    return usbcdc_reqlock(APP_MODBUS_INTFNUM, len, BYTEBUF_TOKEN_MODBUS);
+    return usbcdc_reqlock(MODBUS_TRANSPORT_USBCDC_INTFNUM, len, BYTEBUF_TOKEN_MODBUS);
 }
 static inline uint8_t modbus_if_rellock(void){
-    return usbcdc_rellock(APP_MODBUS_INTFNUM, BYTEBUF_TOKEN_MODBUS);
+    return usbcdc_rellock(MODBUS_TRANSPORT_USBCDC_INTFNUM, BYTEBUF_TOKEN_MODBUS);
 }
 static inline uint8_t modbus_if_write(uint8_t *buffer, uint8_t len){
-    return usbcdc_write(APP_MODBUS_INTFNUM, buffer, len, BYTEBUF_TOKEN_MODBUS);
+    return usbcdc_write(MODBUS_TRANSPORT_USBCDC_INTFNUM, buffer, len, BYTEBUF_TOKEN_MODBUS);
 }
 static inline void modbus_if_flush(void){
-    usbcdc_send_flush(APP_MODBUS_INTFNUM);
+    usbcdc_send_flush(MODBUS_TRANSPORT_USBCDC_INTFNUM);
     return;
 }
 #endif

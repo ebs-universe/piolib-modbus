@@ -42,8 +42,15 @@
 
 #include "aduformat/uart.h"
 #include "fcodes/crlen.h"
-#include "bsp/hal/uc/usbcdc.h"
-#include "bsp/hal/uc/uart.h"
+
+#if MODBUS_PLUGGABLE_TRANSPORTS == 1
+#if MODBUS_ENABLE_TRANSPORT_USBCDC
+    #include "bsp/hal/uc/usbcdc.h"
+#endif
+#if MODBUS_ENABLE_TRANSPORT_UART
+    #include "bsp/hal/uc/uart.h"
+#endif
+#endif
 
 modbus_ctrans_t modbus_ctrans;
 uint8_t modbus_rxtxbuf[MODBUS_ADU_MAXLEN];
@@ -60,13 +67,15 @@ modbus_sm_t modbus_sm = {
     #if MODBUS_PLUGGABLE_TRANSPORTS == 1
         #if APP_MODBUS_TRANSPORT == MODBUS_APPTRANSPORT
         &ptransport_modbus,
+        0,
         #elif APP_MODBUS_TRANSPORT == MODBUS_USBCDC
         &ptransport_usbcdc,
+        MODBUS_TRANSPORT_USBCDC_INTFNUM,
         #elif APP_MODBUS_TRANSPORT == MODBUS_UART
         &ptransport_uart,
+        MODBUS_TRANSPORT_UART_INTFNUM,
         #endif
     #endif 
-        APP_MODBUS_INTFNUM,
         MODBUS_ST_PREINIT,
         MODBUS_OUT_NORMAL,
         0,
