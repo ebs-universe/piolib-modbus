@@ -49,20 +49,24 @@
 #include "app/config.h"
 #include "bsp/hal/uc/types.h"
 
-#define APP_ENABLE_BCIF         1
+#define APP_ENABLE_BCIF         0
 #define APP_ENABLE_UCDM         1
 
 /**
  * @name Modbus Interface Configuration
  */
-/**@{*/ 
+/**@{*/
     /**
     * @name Modbus Interface Configuration
     */
     /**@{*/ 
-    #define APP_ENABLE_MODBUS         1
-    #define APP_MODBUS_INTFNUM        1
-    #define APP_MODBUS_TRANSPORT      2
+    #define APP_ENABLE_MODBUS               1
+    #define MODBUS_PLUGGABLE_TRANSPORTS     1
+    #define MODBUS_ENABLE_TRANSPORT_UART    1
+    #define MODBUS_TRANSPORT_UART_INTFNUM   1
+    #define MODBUS_ENABLE_TRANSPORT_USBCDC  1
+    #define MODBUS_TRANSPORT_USBCDC_INTFNUM 1
+    #define APP_MODBUS_TRANSPORT            MODBUS_USBCDC
     /**@}*/ 
 /**@}*/ 
 

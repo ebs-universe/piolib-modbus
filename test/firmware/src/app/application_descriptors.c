@@ -2,7 +2,7 @@
 
 #include "application.h"
 #include "application_descriptors.h"
-#include <ucdm/descriptors.h>
+#include <ucdm/descriptor.h>
 #include "sys/modbus/modbus.h"
 #include "bsp/hal/uc/id.h"
 
@@ -26,7 +26,7 @@ const descriptor_firmware_t descriptor_firmware = {
 };
 
 
-descriptor_custom_t descriptor_mac = {0x00, 8, DESCRIPTOR_ACCTYPE_RFUNC, {&id_read}, NULL};
+descriptor_custom_t descriptor_mac = {NULL, 0x00, 8, DESCRIPTOR_ACCTYPE_RFUNC, {&id_read}};
 
 
 void application_descriptors_init(void){
