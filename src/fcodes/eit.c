@@ -38,7 +38,7 @@
  */
 
 #include <ucdm/ucdm.h>
-#include <ucdm/descriptors.h>
+#include <ucdm/descriptor.h>
 #include <string.h>
 
 #include "../modbus.h"
