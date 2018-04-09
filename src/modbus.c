@@ -44,20 +44,15 @@
 #include "fcodes/crlen.h"
 
 #if MODBUS_PLUGGABLE_TRANSPORTS == 1
-#if MODBUS_ENABLE_TRANSPORT_USBCDC
-    #include "bsp/hal/uc/usbcdc.h"
-#endif
-#if MODBUS_ENABLE_TRANSPORT_UART
-    #include "bsp/hal/uc/uart.h"
-#endif
+#include "hotplug.h"
 #endif
 
 modbus_ctrans_t modbus_ctrans;
 uint8_t modbus_rxtxbuf[MODBUS_ADU_MAXLEN];
 
-#if MODBUS_USE_TIMEOUTS && MODBUS_TIMEOUT_TYPE == MODBUS_TIMEOUT_INTERNAL
+#if MODBUS_USE_TIMEOUTS
     uint32_t modbus_next_timeout;
-#elif MODBUS_USE_TIMEOUTS && MODBUS_TIMEOUT_TYPE == MODBUS_TIMEOUT_CRON
+#elif MODBUS_USE_TIMEOUTS
 #endif
 
 modbus_sm_t modbus_sm = {
@@ -85,7 +80,7 @@ modbus_sm_t modbus_sm = {
 
 uint16_t * modbus_address_p;
 
-/** @brief UUID Library Version Descriptor */
+/** @brief Modbus Library Version Descriptor */
 static descriptor_custom_t modbus_descriptor = {NULL, 
     DESCRIPTOR_TAG_LIBVERSION, sizeof(MODBUS_VERSION), 
     DESCRIPTOR_ACCTYPE_PTR, {MODBUS_VERSION}};
@@ -129,11 +124,40 @@ static inline uint16_t _modbus_init_interface(uint16_t ucdm_next_address,
 uint16_t modbus_init(uint16_t ucdm_next_address, uint16_t tmodbus_address){
     ucdm_next_address = _modbus_init_interface(ucdm_next_address, tmodbus_address);
     modbus_init_diagnostics();
+    #if MODBUS_PLUGGABLE_TRANSPORTS == 1 
+    modbus_init_ptransports();
+    #endif 
     modbus_reset_all();
     return ucdm_next_address;
 }
 
+#if MODBUS_USE_TIMEOUTS
+static inline void _mbtimeout_set(uint8_t seconds){
+    modbus_next_timeout = tm_current.seconds + seconds;    
+}
+static inline void _mbtimeout_clear(void){
+    modbus_next_timeout = 0;
+}
+static inline uint8_t _mbtimeout_check(void){
+    if (tm_current.seconds > modbus_next_timeout){
+        return 1;
+    }
+    else{
+        return 0;
+    }
+}
+#else 
+static inline void _mbtimeout_set(uint8_t seconds){
+    ;    
+}
+static inline void _mbtimeout_clear(void){
+    ;
+}
+static inline uint8_t _mbtimeout_check(void){
+    return 0;
+}
 
+#endif
 // MODBUS State Machine Implementation
 void modbus_state_machine(void){
     // This function can be moved to the application layer and reimplemented there
@@ -151,10 +175,7 @@ void modbus_state_machine(void){
         case MODBUS_ST_IDLE:
             tvar8 = modbus_sm.aduformat->prefix_n + 1;
             if (modbus_if_unhandled_rxb() >= tvar8){
-                #if MODBUS_USE_TIMEOUTS && MODBUS_TIMEOUT_TYPE == MODBUS_TIMEOUT_INTERNAL
-                modbus_next_timeout = tm_current.seconds + 1;
-                #elif MODBUS_USE_TIMEOUTS && MODBUS_TIMEOUT_TYPE == MODBUS_TIMEOUT_CRON
-                #endif
+                _mbtimeout_set(1);
                 modbus_if_read(&(modbus_rxtxbuf[0]), tvar8);
                 modbus_sm.rxtxlen = tvar8;
                 modbus_ctrans.fcode = modbus_rxtxbuf[tvar8-1];
@@ -175,25 +196,19 @@ void modbus_state_machine(void){
                     }
                 }
                 if (tvar8){
-                    #if MODBUS_USE_TIMEOUTS && MODBUS_TIMEOUT_TYPE == MODBUS_TIMEOUT_INTERNAL
-                    modbus_next_timeout = tm_current.seconds + 2;
-                    #elif MODBUS_USE_TIMEOUTS && MODBUS_TIMEOUT_TYPE == MODBUS_TIMEOUT_CRON
-                    #endif
+                    _mbtimeout_set(2);
                     modbus_if_read(&(modbus_rxtxbuf[modbus_sm.rxtxlen]), tvar8);
                     modbus_sm.rxtxlen += tvar8;
                 }
                 else{
-                    if (tm_current.seconds > modbus_next_timeout){
+                    if (_mbtimeout_check()){
                         // TODO Also flush rxbuf?
                         modbus_reset_sm();
                     }
                 }
             }
             else{
-                #if MODBUS_USE_TIMEOUTS && MODBUS_TIMEOUT_TYPE == MODBUS_TIMEOUT_INTERNAL
-                modbus_next_timeout = 0;
-                #elif MODBUS_USE_TIMEOUTS && MODBUS_TIMEOUT_TYPE == MODBUS_TIMEOUT_CRON
-                #endif
+                _mbtimeout_clear();
                 modbus_sm.state = MODBUS_ST_VERIFY;
             }
             break;

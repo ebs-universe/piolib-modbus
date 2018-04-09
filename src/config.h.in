@@ -44,7 +44,7 @@
 #define MODBUS_UART                         1
 #define MODBUS_USBCDC                       2
 
-#define MODBUS_ADUFORMAT_UART               0x01
+#define MODBUS_ADUFORMAT_UART               1
 /**@}*/
 
 

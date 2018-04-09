@@ -78,10 +78,6 @@
 #include "config.h"
 #include "fcodes/common.h"
 
-#define MODBUS_TIMEOUT_INTERNAL         0
-#define MODBUS_TIMEOUT_CRON             1  // Not currently implemented
-#define MODBUS_TIMEOUT_TYPE             MODBUS_TIMEOUT_INTERNAL
-
 /**
  * @name Modbus State Machine State Variable States
  */
@@ -117,8 +113,7 @@
  */
 /**@{*/ 
 
-typedef struct MODBUS_ADUFORMAT_t
-{
+typedef struct MODBUS_ADUFORMAT_t{
     const uint8_t prefix_n;
     const uint8_t postfix_n;
     void (*const pack)(void);
@@ -126,8 +121,7 @@ typedef struct MODBUS_ADUFORMAT_t
     void (*const write)(void);
 }modbus_aduformat_t;
 
-typedef struct MODBUS_SM_t
-{
+typedef struct MODBUS_SM_t{
     const modbus_aduformat_t * aduformat;
 #if MODBUS_PLUGGABLE_TRANSPORTS == 1
     const pluggable_transport_t * transport;
@@ -140,13 +134,19 @@ typedef struct MODBUS_SM_t
     uint8_t * txp;
 }modbus_sm_t;
 
-typedef struct MODBUS_CTRANS_t
-{
+typedef struct MODBUS_CTRANS_t{
     uint8_t broadcast;
     uint8_t fcode;
     const modbus_fcode_handler_t * fcode_handler;
 }modbus_ctrans_t;
 
+typedef struct MODBUS_TRANSPORT_t{
+    struct MODBUS_TRANSPORT_t * next;
+    uint8_t tag;
+    const pluggable_transport_t * const transport;
+    const modbus_aduformat_t * const aduformat;
+    const uint8_t intfnum;
+}modbus_transport_t;
 
 extern uint16_t * modbus_address_p;
 extern modbus_sm_t modbus_sm;
