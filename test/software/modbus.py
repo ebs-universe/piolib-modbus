@@ -26,22 +26,20 @@ import os
 import pytest
 
 try:
-    from pymodbus_ebs import ModbusClient
+    from pymodbus_ebs import HotplugModbusClient
     from pymodbus_ebs import ModbusServerException
 except ImportError:
     from pymodbus.client.sync import ModbusSerialClient as ModbusClient
     ModbusServerException = None
-
 
 SLAVE_NREGS = 200
 
 
 @pytest.fixture
 def client(request):
-    port = os.path.join('/dev', request.config.getoption('--port'))
-    mclient = ModbusClient(method='rtu', port=port, timeout=0.1,
-                           baudrate=int(request.config.getoption('--baud')))
+    mclient = HotplugModbusClient(method='rtu', timeout=0.1, **request.param)
     mclient.connect()
+    mclient.claim_interface(unit=5)
 
     def done():
         mclient.close()

@@ -174,3 +174,15 @@ class ModbusClient(ModbusSerialClient):
         elif method == 'socket':
             return ModbusSocketFramer(EBSClientDecoder())
         raise ParameterException("Invalid framer method requested")
+
+
+class HotplugModbusClient(ModbusClient):
+    def __init__(self, method='ascii', **kwargs):
+        super(HotplugModbusClient, self).__init__(method, **kwargs)
+
+    def claim_interface(self, unit):
+        request = WriteSingleRegisterRequest(1, 1, unit=unit)
+        try:
+            self.execute(request)
+        except ModbusServerException:
+            pass
