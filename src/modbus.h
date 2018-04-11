@@ -106,6 +106,8 @@
 #define MODBUS_CTT_BROADCAST    1
 /**@}*/ 
 
+#define UCDM_OFS_MB_TRANSPORT   1
+
 
 /**
  * @name Modbus Internal Containers and Types

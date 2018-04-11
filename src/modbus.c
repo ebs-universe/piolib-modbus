@@ -33,7 +33,6 @@
 #include <ucdm/ucdm.h>
 #include <ucdm/descriptor.h>
 #include <time/time.h>
-#include <time/cron.h>
 
 #include "modbus.h"
 #include "dispatch.h"
@@ -52,7 +51,6 @@ uint8_t modbus_rxtxbuf[MODBUS_ADU_MAXLEN];
 
 #if MODBUS_USE_TIMEOUTS
     uint32_t modbus_next_timeout;
-#elif MODBUS_USE_TIMEOUTS
 #endif
 
 modbus_sm_t modbus_sm = {
@@ -60,16 +58,8 @@ modbus_sm_t modbus_sm = {
         &modbus_aduformat_uart,
     #endif
     #if MODBUS_PLUGGABLE_TRANSPORTS == 1
-        #if APP_MODBUS_TRANSPORT == MODBUS_APPTRANSPORT
-        &ptransport_modbus,
+        NULL, 
         0,
-        #elif APP_MODBUS_TRANSPORT == MODBUS_USBCDC
-        &ptransport_usbcdc,
-        MODBUS_TRANSPORT_USBCDC_INTFNUM,
-        #elif APP_MODBUS_TRANSPORT == MODBUS_UART
-        &ptransport_uart,
-        MODBUS_TRANSPORT_UART_INTFNUM,
-        #endif
     #endif 
         MODBUS_ST_PREINIT,
         MODBUS_OUT_NORMAL,
@@ -117,18 +107,18 @@ static inline uint16_t _modbus_init_interface(uint16_t ucdm_next_address,
     modbus_if_init();
     modbus_address_p = &(ucdm_register[ucdm_next_address].data);
     modbus_set_address(tmodbus_address);
-    return ucdm_next_address++;
+    return (ucdm_next_address + 1);
 }
 
 
 uint16_t modbus_init(uint16_t ucdm_next_address, uint16_t tmodbus_address){
-    ucdm_next_address = _modbus_init_interface(ucdm_next_address, tmodbus_address);
-    modbus_init_diagnostics();
     #if MODBUS_PLUGGABLE_TRANSPORTS == 1 
-    modbus_init_ptransports();
-    #endif 
+    modbus_init_ptransports(ucdm_next_address + 1);
+    #endif
+    _modbus_init_interface(ucdm_next_address, tmodbus_address);
+    modbus_init_diagnostics();
     modbus_reset_all();
-    return ucdm_next_address;
+    return ucdm_next_address + 2;
 }
 
 #if MODBUS_USE_TIMEOUTS
@@ -156,7 +146,6 @@ static inline void _mbtimeout_clear(void){
 static inline uint8_t _mbtimeout_check(void){
     return 0;
 }
-
 #endif
 // MODBUS State Machine Implementation
 void modbus_state_machine(void){
@@ -169,6 +158,9 @@ void modbus_state_machine(void){
     // machines is used consistently within the application.
     uint8_t tvar8;
     uint8_t uvar8;
+    #if MODBUS_PLUGGABLE_TRANSPORTS
+    modbus_hotplug_check();
+    #endif
     switch(modbus_sm.state){
         case MODBUS_ST_PREINIT:
             break;
