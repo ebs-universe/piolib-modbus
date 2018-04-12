@@ -95,11 +95,15 @@ void modbus_handler_wrregs(void)
     uint16_t saddr = MODBUS_RWORD(1, 2);
     uint16_t tvar;
     uint8_t * rp;
-    uint8_t ecount=0;
+    uint8_t rval;
+    uint8_t scount = 0;
     
     if (saddr + n >= DMAP_MAXREGS){    
         // WARNING If some / all of the registers are not writeable, 
-        // an exception is not returned.
+        // an exception is not returned. This is unavoidable because
+        // errors would show up only after some of the registers have 
+        // already been written, leaving an indeterminate state. This
+        // way, we hold the application responsible. 
         modbus_build_exc_response(0x02);
         return;
     }
@@ -110,14 +114,15 @@ void modbus_handler_wrregs(void)
         tvar = (uint16_t)(*(rp++));
         tvar = tvar << 8;
         tvar |= *(rp++);
-        ecount += ucdm_set_register(saddr + i, tvar);
+        rval = ucdm_set_register(saddr + i, tvar);
+        if (rval == 0) scount ++;
     }
     
     if (modbus_ctrans.broadcast){
         return;   
     }
     modbus_sm.rxtxlen = modbus_sm.aduformat->prefix_n + 5;
-    MODBUS_RBYTE(4) = n;
+    MODBUS_RBYTE(4) = scount;
     modbus_sm.aduformat->pack();
     return;
 }

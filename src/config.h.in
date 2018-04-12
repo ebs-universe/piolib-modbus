@@ -107,9 +107,31 @@
 #endif
 
 /**
- * @name Modbus Function Codes Support Inclusion
+ * @name Modbus Function Groups Support Inclusion
  */
 /**@{*/
+#ifndef MB_SUPPORT_BITFUNCS            
+    #define MB_SUPPORT_BITFUNCS             @MB_SUPPORT_BITFUNCS@
+#endif
+
+#ifndef MB_SUPPORT_REGFUNCS            
+    #define MB_SUPPORT_REGFUNCS             @MB_SUPPORT_REGFUNCS@
+#endif
+
+#ifndef MB_SUPPORT_FILEFUNCS            
+    #define MB_SUPPORT_FILEFUNCS            @MB_SUPPORT_FILEFUNCS@
+#endif
+
+#ifndef MB_SUPPORT_CELOGFUNCS            
+    #define MB_SUPPORT_CELOGFUNCS           @MB_SUPPORT_CELOGFUNCS@
+#endif
+/**@}*/
+
+/**
+ * @name Modbus Individual Function Codes Support Inclusion
+ */
+/**@{*/
+
 #ifndef MB_SUPPORT_FC_RD_COILS
     #define MB_SUPPORT_FC_RD_COILS          @MB_SUPPORT_FC_RD_COILS@
 #endif

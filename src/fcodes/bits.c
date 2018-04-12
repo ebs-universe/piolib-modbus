@@ -32,11 +32,6 @@
 #include "bits.h"
 
 
-void modbus_handler_rdbits(void)
-{
-    modbus_handler_notimpl();
-}
-
 void modbus_handler_wrsbit(void)
 {
     uint16_t addrb = MODBUS_RWORD(1, 2);
@@ -56,9 +51,96 @@ void modbus_handler_wrsbit(void)
     return;
 }
 
+void modbus_handler_rdbits(void)
+{
+    uint16_t addrb = MODBUS_RWORD(1, 2);
+    uint16_t len = MODBUS_RWORD(3, 4);
+    uint8_t res, byte, mask;
+    uint8_t * wp;
+    
+    if (len > 0x07D0){
+        modbus_build_exc_response(0x03);
+        return;
+    }
+    if (addrb + len > DMAP_MAXBITS){
+        modbus_build_exc_response(0x02);
+        return;
+    }
+    
+    wp = &modbus_rxtxbuf[modbus_sm.aduformat->prefix_n + 1];
+    uint8_t olen = len / 8 + (len % 8 != 0);
+    modbus_sm.rxtxlen = modbus_sm.aduformat->prefix_n + 2 + olen;
+    *(wp++) = olen;
+    
+    byte = 0x00;
+    mask = 0x01;
+    while (len){
+        res = ucdm_get_bit(addrb);
+        if (res) byte |= mask;
+        if (mask != 0x80){
+            mask = mask << 1; 
+        }
+        else{
+            *(wp++) = byte;
+            byte = 0x00;
+            mask = 0x01;
+        }
+        len--;
+        addrb++;
+    }
+    if (mask != 0x01){
+        *(wp++) = byte;
+    }
+    
+    modbus_sm.aduformat->pack();
+    return;
+}
+
 void modbus_handler_wrbits(void)
 {
-    modbus_handler_notimpl();
+    uint16_t addrb = MODBUS_RWORD(1, 2);
+    uint16_t len = MODBUS_RWORD(3, 4);
+    uint16_t scount = 0;
+    uint8_t res, bit, mask;
+    uint8_t * rp = &MODBUS_RBYTE(6);
+    
+    if (len > 0x07D0){
+        modbus_build_exc_response(0x03);
+        return;
+    }
+    if (addrb + len > DMAP_MAXBITS){
+        modbus_build_exc_response(0x02);
+        return;
+    }
+    
+    mask = 0x01;
+    while(len){
+        bit = *rp | mask;
+        if (bit){
+            res = ucdm_set_bit(addrb);
+        }
+        else{
+            res = ucdm_clear_bit(addrb);
+        }
+        if (res == 0){
+            scount ++;
+        }
+        addrb ++;
+        len --;
+        if (mask == 0x80){
+            mask = 0x01;
+            rp ++;
+        }
+        else{
+            mask = mask << 1;
+        }
+    }
+    
+    MODBUS_RBYTE(3) = (uint8_t)(scount >> 8);
+    MODBUS_RBYTE(4) = (uint8_t)(scount);
+    modbus_sm.rxtxlen = modbus_sm.aduformat->prefix_n + 5;
+    modbus_sm.aduformat->pack();
+    return;
 }
 
 const modbus_fcode_handler_t _rdcoils_handler = {
