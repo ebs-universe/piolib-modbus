@@ -67,6 +67,10 @@
     #define MODBUS_ENABLE_TRANSPORT_USBCDC  1
     #define MODBUS_TRANSPORT_USBCDC_INTFNUM 1
     #define APP_MODBUS_TRANSPORT            MODBUS_USBCDC
+    #define MB_SUPPORT_BITFUNCS             1
+    #define MB_SUPPORT_REGFUNCS             1
+    #define MB_SUPPORT_FILEFUNCS            1
+    #define MB_SUPPORT_CELOGFUNCS           1
     /**@}*/ 
 /**@}*/ 
 
