@@ -20,6 +20,7 @@ uint16_t _mb_tr_addr;
 modbus_transport_t modbus_transport_uart = {NULL, MODBUS_TRANSPORT_TAG_UART, 
     &ptransport_uart, &modbus_aduformat_uart, MODBUS_TRANSPORT_UART_INTFNUM};
 #endif
+    
 #if MODBUS_ENABLE_TRANSPORT_USBCDC == 1
 modbus_transport_t modbus_transport_usbcdc = {NULL, MODBUS_TRANSPORT_TAG_USBCDC, 
     &ptransport_usbcdc, &modbus_aduformat_uart, MODBUS_TRANSPORT_USBCDC_INTFNUM};
@@ -62,7 +63,7 @@ void modbus_hotplug_check(void){
     while(mbt){
         // Dont try to do anything on the transport currently in use 
         if (mbt->tag == ucdm_register[_mb_tr_addr].data) goto next_transport;
-
+        
         // If there isn't anything waiting in the read buffer, move on
         rlen = mbt->transport->unhandled_rxb(mbt->intfnum);
         if (rlen == 0) goto next_transport;
