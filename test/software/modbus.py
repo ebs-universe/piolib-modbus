@@ -22,24 +22,28 @@
 Docstring for modbus
 """
 
-import os
 import pytest
 
 try:
-    from pymodbus_ebs import HotplugModbusClient
+    from pymodbus_ebs import HotplugModbusClient as ModbusClient
     from pymodbus_ebs import ModbusServerException
 except ImportError:
     from pymodbus.client.sync import ModbusSerialClient as ModbusClient
     ModbusServerException = None
 
-SLAVE_NREGS = 200
+SLAVE_NREGS = 64
+TEST_ADDRESS_BASE = 5
 
 
 @pytest.fixture
 def client(request):
-    mclient = HotplugModbusClient(method='rtu', timeout=0.1, **request.param)
+    mclient = ModbusClient(method='rtu', timeout=0.1, **request.param)
     mclient.connect()
-    mclient.claim_interface(unit=5)
+    try:
+        mclient.claim_interface(unit=5)
+    except AttributeError:
+        pass
+    mclient.write_register(0x04, 0x00, unit=5)
 
     def done():
         mclient.close()
@@ -50,4 +54,3 @@ def client(request):
 @pytest.fixture
 def saddress(request):
     return int(request.config.getoption('--saddress'))
-
