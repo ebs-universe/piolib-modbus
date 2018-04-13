@@ -50,7 +50,9 @@ modbus_ctrans_t modbus_ctrans;
 uint8_t modbus_rxtxbuf[MODBUS_ADU_MAXLEN];
 
 #if MODBUS_USE_TIMEOUTS
-    uint32_t modbus_next_timeout;
+    tm_system_t modbus_next_timeout;
+    void _mbtimeout_change_handler(tm_sdelta_t * offset);
+    tm_epochchange_handler_t _mbtimeout_epochchange_handler = {NULL, 3, &_mbtimeout_change_handler};
 #endif
 
 modbus_sm_t modbus_sm = {
@@ -75,12 +77,10 @@ static descriptor_custom_t modbus_descriptor = {NULL,
     DESCRIPTOR_TAG_LIBVERSION, sizeof(MODBUS_VERSION), 
     DESCRIPTOR_ACCTYPE_PTR, {MODBUS_VERSION}};
 
-    
 void modbus_install_descriptor(void)
 {
     descriptor_install(&modbus_descriptor);
 }
-
 
 void modbus_reset_sm(void){
     modbus_sm.rxtxlen = 0;
@@ -93,11 +93,9 @@ void modbus_reset_all(void){
     modbus_reset_sm();
 }
 
-
 void modbus_set_address(uint16_t tmodbus_address){
     *modbus_address_p = tmodbus_address;
 }
-
 
 static inline uint16_t _modbus_init_interface(uint16_t ucdm_next_address, 
                                               uint16_t tmodbus_address);
@@ -110,7 +108,6 @@ static inline uint16_t _modbus_init_interface(uint16_t ucdm_next_address,
     return (ucdm_next_address + 1);
 }
 
-
 uint16_t modbus_init(uint16_t ucdm_next_address, uint16_t tmodbus_address){
     #if MODBUS_PLUGGABLE_TRANSPORTS == 1 
     modbus_init_ptransports(ucdm_next_address + 1);
@@ -118,23 +115,33 @@ uint16_t modbus_init(uint16_t ucdm_next_address, uint16_t tmodbus_address){
     _modbus_init_interface(ucdm_next_address, tmodbus_address);
     modbus_init_diagnostics();
     modbus_reset_all();
+    #if MODBUS_USE_TIMEOUTS
+    tm_register_epoch_change_handler(&_mbtimeout_epochchange_handler);
+    #endif
     return ucdm_next_address + 2;
 }
 
 #if MODBUS_USE_TIMEOUTS
 static inline void _mbtimeout_set(uint8_t seconds){
-    modbus_next_timeout = tm_current.seconds + seconds;    
+    tm_current_time(&modbus_next_timeout);
+    modbus_next_timeout.seconds += seconds;
 }
+
 static inline void _mbtimeout_clear(void){
-    modbus_next_timeout = 0;
+    tm_clear_stime(&modbus_next_timeout);
 }
+
 static inline uint8_t _mbtimeout_check(void){
-    if (tm_current.seconds > modbus_next_timeout){
+    if (tm_cmp_stime(&tm_current, &modbus_next_timeout) == 1){
         return 1;
     }
     else{
         return 0;
     }
+}
+
+void _mbtimeout_change_handler(tm_sdelta_t * offset){
+    tm_apply_sdelta(&modbus_next_timeout, offset);
 }
 #else 
 static inline void _mbtimeout_set(uint8_t seconds){
@@ -147,6 +154,8 @@ static inline uint8_t _mbtimeout_check(void){
     return 0;
 }
 #endif
+
+
 // MODBUS State Machine Implementation
 void modbus_state_machine(void){
     // This function can be moved to the application layer and reimplemented there
@@ -193,10 +202,7 @@ void modbus_state_machine(void){
                     modbus_sm.rxtxlen += tvar8;
                 }
                 else{
-                    if (_mbtimeout_check()){
-                        // TODO Also flush rxbuf?
-                        modbus_reset_sm();
-                    }
+                    if (_mbtimeout_check()) modbus_reset_sm();
                 }
             }
             else{
@@ -264,4 +270,3 @@ uint16_t modbus_calculate_crc(uint8_t * cmd, uint8_t len)
   
   return crc;  
 }
-
