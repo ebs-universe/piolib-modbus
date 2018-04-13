@@ -71,6 +71,7 @@
     #define MB_SUPPORT_REGFUNCS             1
     #define MB_SUPPORT_FILEFUNCS            1
     #define MB_SUPPORT_CELOGFUNCS           1
+    #define MODBUS_USE_TIMEOUTS             1
     /**@}*/ 
 /**@}*/ 
 

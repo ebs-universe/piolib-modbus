@@ -9,7 +9,8 @@
 void modbus_test_reset_field(uint16_t addr, uint16_t value);
 
 void modbus_test_reset_field(uint16_t __attribute__((unused)) addr, uint16_t __attribute__((unused)) value){
-    memset(&(ucdm_register[5]), 0, sizeof(ucdm_register_t) * (DMAP_MAXREGS - 4));
+    memset(&(ucdm_register[DMAP_MODBUS_TEST_BASE_ADDRESS + 1]), 0, 
+           sizeof(ucdm_register_t) * (DMAP_MAXREGS - DMAP_MODBUS_TEST_BASE_ADDRESS - 1));
     modbus_sm.silent = MODBUS_OUT_NORMAL;
 }
 

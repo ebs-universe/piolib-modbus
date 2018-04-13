@@ -3,13 +3,10 @@
 
 #include "time.h"
 
-#define UCDM_TIME_SYSTEM_ADDRESS         UCDM_TIME_BASE_ADDRESS
-#define UCDM_TIME_EPOCH_ADDRESS         (UCDM_TIME_BASE_ADDRESS  + (sizeof(tm_system_t) / 2) + (sizeof(tm_system_t) % 2 != 0))
-#define UCDM_TIME_SYNC_HANDLER_ADDRESS  (UCDM_TIME_EPOCH_ADDRESS + (sizeof(tm_real_t) / 2)   + (sizeof(tm_real_t) % 2 != 0))
-
 uint16_t app_tm_init(uint16_t ucdm_next_address)
 {
-    ucdm_next_address = tm_init(ucdm_next_address);
+    tm_init();
+    tm_cron_init();
     ucdm_next_address = tm_sync_init(ucdm_next_address);
     return ucdm_next_address;
 }

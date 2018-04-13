@@ -32,6 +32,7 @@
 #include "bsp/hal/uc.h"
 #include <time/time.h>
 #include <time/sync.h>
+#include <time/cron.h>
 
 uint16_t app_tm_init(uint16_t ucdm_next_address);
 

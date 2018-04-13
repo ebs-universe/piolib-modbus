@@ -6,7 +6,6 @@
 #include "sys/sys.h"
 
 #include "sys/modbus/modbus.h"
-#include <time/sync.h>
 
 #include "test_modbus.h"
 
@@ -59,6 +58,7 @@ int main(void)
     #endif
     
     ucdm_init();
+    app_tm_init(DMAP_TIME_BASE_ADDRESS);
     
     #if APP_ENABLE_MODBUS == 1
         modbus_init(DMAP_MODBUS_BASE_ADDRESS, MODBUS_DEFAULT_DEVICE_ADDRESS);

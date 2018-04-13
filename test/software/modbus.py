@@ -32,7 +32,7 @@ except ImportError:
     ModbusServerException = None
 
 SLAVE_NREGS = 64
-TEST_ADDRESS_BASE = 5
+TEST_ADDRESS_BASE = 14
 
 
 @pytest.fixture
@@ -43,7 +43,7 @@ def client(request):
         mclient.claim_interface(unit=5)
     except AttributeError:
         pass
-    mclient.write_register(0x04, 0x00, unit=5)
+    mclient.write_register(TEST_ADDRESS_BASE, 0x00, unit=5)
 
     def done():
         mclient.close()

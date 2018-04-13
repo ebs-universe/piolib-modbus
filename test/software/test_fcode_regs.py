@@ -20,34 +20,34 @@ def test_modbus_broadcast_rdregs_preliminary(client):
 
 def test_wrsreg_1b(client, saddress):
     request = register_write_message.WriteSingleRegisterRequest(
-        TEST_ADDRESS_BASE + 1, 100, unit=5
+        TEST_ADDRESS_BASE + 2, 100, unit=5
     )
     client.execute(request)
-    rval = client.read_holding_registers(TEST_ADDRESS_BASE + 1, unit=saddress)
+    rval = client.read_holding_registers(TEST_ADDRESS_BASE + 2, unit=saddress)
     assert rval.registers[0] == 100
 
 
 def test_wrsreg_2b(client, saddress):
     request = register_write_message.WriteSingleRegisterRequest(
-        TEST_ADDRESS_BASE + 1, 1004, unit=5
+        TEST_ADDRESS_BASE + 4, 1004, unit=5
     )
     client.execute(request)
-    rval = client.read_holding_registers(TEST_ADDRESS_BASE + 1, unit=saddress)
+    rval = client.read_holding_registers(TEST_ADDRESS_BASE + 4, unit=saddress)
     assert rval.registers[0] == 1004
 
 
 def test_wrsreg_broadcast(client, saddress):
     request = register_write_message.WriteSingleRegisterRequest(
-        TEST_ADDRESS_BASE + 1, 100, unit=0x00)
+        TEST_ADDRESS_BASE + 4, 100, unit=0x00)
     response = client.execute(request)
     assert isinstance(response, ModbusIOException)
-    rval = client.read_holding_registers(TEST_ADDRESS_BASE + 1, unit=saddress)
+    rval = client.read_holding_registers(TEST_ADDRESS_BASE + 4, unit=saddress)
     assert rval.registers[0] == 100
 
 
 def test_wrsreg_protected(client, saddress):
     request = register_write_message.WriteSingleRegisterRequest(
-        5, 4, unit=saddress)
+        11, 4, unit=saddress)
     with pytest.raises(ModbusServerException):
         client.execute(request)
     rval = client.read_holding_registers(5, unit=saddress)
@@ -70,15 +70,15 @@ def test_wrsreg_outofrange_2b(client, saddress):
 
 def test_wrmregs_2b(client, saddress):
     request = register_write_message.WriteMultipleRegistersRequest(
-        address=TEST_ADDRESS_BASE + 1, values=[322, 12, 4000], unit=saddress
+        address=TEST_ADDRESS_BASE + 2, values=[322, 12, 4000], unit=saddress
     )
     response = client.execute(request)
     assert response.count == 3
-    rval = client.read_holding_registers(TEST_ADDRESS_BASE + 1, unit=saddress)
-    assert rval.registers[0] == 322
     rval = client.read_holding_registers(TEST_ADDRESS_BASE + 2, unit=saddress)
-    assert rval.registers[0] == 12
+    assert rval.registers[0] == 322
     rval = client.read_holding_registers(TEST_ADDRESS_BASE + 3, unit=saddress)
+    assert rval.registers[0] == 12
+    rval = client.read_holding_registers(TEST_ADDRESS_BASE + 4, unit=saddress)
     assert rval.registers[0] == 4000
 
 
@@ -91,9 +91,9 @@ def test_wrmregs_2b_partial_protect(client, saddress):
     rval = client.read_holding_registers(TEST_ADDRESS_BASE + 4, unit=saddress)
     assert rval.registers[0] == 322
     rval = client.read_holding_registers(TEST_ADDRESS_BASE + 5, unit=saddress)
-    assert rval.registers[0] == 0
+    assert rval.registers[0] == 12
     rval = client.read_holding_registers(TEST_ADDRESS_BASE + 6, unit=saddress)
-    assert rval.registers[0] == 4000
+    assert rval.registers[0] == 0
 
 
 def test_wrmregs_outofrange_start(client, saddress):
@@ -112,17 +112,17 @@ def test_wrmregs_outofrange_end(client, saddress):
 
 def test_rdregs_hr_1r_1b(client, saddress):
     request = register_write_message.WriteSingleRegisterRequest(
-        TEST_ADDRESS_BASE + 1, 10, unit=saddress)
+        TEST_ADDRESS_BASE + 2, 10, unit=saddress)
     client.execute(request)
-    rval = client.read_holding_registers(TEST_ADDRESS_BASE + 1, unit=saddress)
+    rval = client.read_holding_registers(TEST_ADDRESS_BASE + 2, unit=saddress)
     assert rval.registers[0] == 10
 
 
 def test_rdregs_ir_1r_1b(client, saddress):
     request = register_write_message.WriteSingleRegisterRequest(
-        TEST_ADDRESS_BASE + 1, 140, unit=saddress)
+        TEST_ADDRESS_BASE + 2, 140, unit=saddress)
     client.execute(request)
-    rval = client.read_input_registers(TEST_ADDRESS_BASE + 1, unit=saddress)
+    rval = client.read_input_registers(TEST_ADDRESS_BASE + 2, unit=saddress)
     assert rval.registers[0] == 140
 
 
@@ -139,7 +139,7 @@ def test_rdregs_ir_mulr_1b(client, saddress):
         address=TEST_ADDRESS_BASE + 2, values= [100, 1004, 322, 12, 4000], unit=saddress)
     client.execute(request)
     rval = client.read_input_registers(TEST_ADDRESS_BASE + 2, count=5, unit=saddress)
-    assert rval.registers == [100, 1004, 322, 0, 4000]
+    assert rval.registers == [100, 1004, 322, 12, 0]
 
 
 def test_rdregs_ir_mulr_2b(client, saddress):
