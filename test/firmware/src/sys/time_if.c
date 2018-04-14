@@ -2,13 +2,14 @@
 
 
 #include "time.h"
+#include "bsp/hal/uc/timer.h"
 
-uint16_t app_tm_init(uint16_t ucdm_next_address)
+uint16_t app_tm_init(uint16_t ucdm_address)
 {
-    tm_init();
+    ucdm_address = tm_init(ucdm_address);
     tm_cron_init();
-    ucdm_next_address = tm_sync_init(ucdm_next_address);
-    return ucdm_next_address;
+    ucdm_address = tm_sync_init(ucdm_address);
+    return ucdm_address;
 }
 
 #if APP_ENABLE_SYSTICK == 1
