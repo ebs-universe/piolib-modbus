@@ -25,11 +25,12 @@ Docstring for modbus
 import pytest
 
 try:
-    from pymodbus_ebs import HotplugModbusClient as ModbusClient
-    from pymodbus_ebs import ModbusServerException
+    from ebs.modbus.client import ModbusClient
+    from ebs.modbus.client import ModbusServerException
+
 except ImportError:
-    from pymodbus.client.sync import ModbusSerialClient as ModbusClient
     ModbusServerException = None
+    from pymodbus.client.sync import ModbusSerialClient as ModbusClient
 
 SLAVE_NREGS = 64
 TEST_ADDRESS_BASE = 14
@@ -39,10 +40,14 @@ TEST_ADDRESS_BASE = 14
 def client(request):
     mclient = ModbusClient(method='rtu', timeout=0.1, **request.param)
     mclient.connect()
+
+    # Claim interface via hotplug
     try:
-        mclient.claim_interface(unit=5)
-    except AttributeError:
+        mclient.write_register(1, 1, unit=5)
+    except ModbusServerException:
         pass
+
+    # Clear test field
     mclient.write_register(TEST_ADDRESS_BASE, 0x00, unit=5)
 
     def done():

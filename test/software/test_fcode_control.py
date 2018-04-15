@@ -26,7 +26,7 @@ def test_diag_rqdata(client, saddress):
     message = random.randint(0, 2**16)
     request = diag_message.ReturnQueryDataRequest(message=message, unit=saddress)
     response = client.execute(request)
-    assert response.message == message
+    assert response.message[0] == message
 
 
 def test_diag_rqdata_broadcast(client):
@@ -54,7 +54,7 @@ def test_diag_forcelistenonly(client, saddress):
     message = random.randint(0, 2 ** 16)
     request = diag_message.ReturnQueryDataRequest(message=message, unit=saddress)
     response = client.execute(request)
-    assert response.message == message
+    assert response.message[0] == message
 
     request = diag_message.RestartCommunicationsOptionRequest(unit=saddress)
     response = client.execute(request)
