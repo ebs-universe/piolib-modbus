@@ -14,6 +14,9 @@ setuptools.setup(
 
     install_requires=['pymodbus'],
 
+    setup_requires=['setuptools_scm'],
+    use_scm_version={'root': '../', 'relative_to': __file__},
+
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
