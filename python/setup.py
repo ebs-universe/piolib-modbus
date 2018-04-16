@@ -15,11 +15,16 @@ setuptools.setup(
     install_requires=['pymodbus'],
 
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
+        'Operating System :: POSIX :: Linux',
+        'Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator',
     ],
 )
