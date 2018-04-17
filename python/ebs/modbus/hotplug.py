@@ -12,3 +12,9 @@ class ModbusHotplugMixin(object):
             self.write_register(1, 1, unit=self.address)
         except ModbusServerException:
             pass
+
+    def connect(
+            self  # type: ModbusDevice
+    ):
+        super(ModbusHotplugMixin, self).connect()
+        self.claim_interface()
