@@ -1,8 +1,9 @@
 
-
-from .client import ModbusClient
 from functools import partial
 from pprint import PrettyPrinter
+
+from pymodbus.other_message import ReadExceptionStatusRequest
+from .client import ModbusClient
 
 
 class ModbusDevice(object):
@@ -46,6 +47,14 @@ class ModbusDevice(object):
             request.unit_id = 0x00
         return self.mc.execute(request)
 
+    @property
+    def exception_status(self):
+        return self.read_exception_status()
+
+    def read_exception_status(self):
+        request = ReadExceptionStatusRequest(unit=self.address)
+        return self.mc.execute(request).status
+
     def print_registry(self):
         pp = PrettyPrinter(indent=4)
         pp.pprint(self._registry)
@@ -53,5 +62,14 @@ class ModbusDevice(object):
     def __getattr__(self, name):
         if name in self._registry['modbus_client_functions']:
             return partial(getattr(self.mc, name), unit=self.address)
-        raise AttributeError('{0} object has not attribute {1}'
-                             ''.format(self.__class__, name))
+        raise AttributeError(
+            """{0} object has no attribute {1}. 
+            
+            Note that due to the method used to dispatch delegated methods 
+            and properties, this error could be misleading. If the error 
+            resulted from a @property which itself raised an AttributeError, 
+            there would have been a lost traceback. Call the underlying 
+            non-@property method directly for debugging.
+            
+            See https://medium.com/@ceshine/python-debugging-pitfall-mixed-use-of-property-and-getattr-f89e0ede13f1
+            """.format(self.__class__, name))

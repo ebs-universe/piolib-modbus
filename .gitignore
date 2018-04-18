@@ -12,5 +12,6 @@ test/firmware/doc
 *.pyc
 *build
 *.egg-info
+.eggs
 *.pytest_cache
 dist
