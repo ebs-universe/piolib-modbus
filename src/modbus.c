@@ -29,7 +29,7 @@
  * @see modbus.h
  */
 
-#include <bytebuf/bytebuf.h>
+
 #include <ucdm/ucdm.h>
 #include <ucdm/descriptor.h>
 #include <time/time.h>

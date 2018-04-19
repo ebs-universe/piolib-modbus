@@ -25,11 +25,10 @@
  *
  * See modbus.h for usage documentation. Implementation 
  * documentation should be added to this file as some point. 
- * 
+ * bytebuf
  * @see aduformat/uart.h
  */
 
-#include <bytebuf/bytebuf.h>
 #include <ucdm/ucdm.h>
 
 #include "../modbus.h"

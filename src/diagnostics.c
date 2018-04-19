@@ -30,9 +30,8 @@
  */
 
 
-#include<bytebuf/bytebuf.h>
-#include<ucdm/ucdm.h>
 
+#include<ucdm/ucdm.h>
 #include "diagnostics.h"
 
 
