@@ -70,14 +70,11 @@ ADD_FILES(SOURCES modbus.c
                   diagnostics.c
                   interface.c
                   dispatch.c                                                                          
-                  hotplug.c)
+                  hotplug.c
+                  crc.c)
 
 ADD_SUBDIRECTORY(aduformat)
 ADD_SUBDIRECTORY(fcodes)
-
-
-MESSAGE(${SOURCES})
-MESSAGE(${HEADERS})
 
 ADD_PLATFORM_LIBRARY(modbus STATIC "ds ucdm time hal-uc-usb" ${SOURCES})
 
