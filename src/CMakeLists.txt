@@ -60,8 +60,24 @@ FALLBACK_DEFAULT(MB_SUPPORT_FC_DIAGNOSTICS      "1")
 
 INCLUDE(ebs/lib-conf)
 
-FILE(GLOB_RECURSE SOURCES *.c)
-FILE(GLOB_RECURSE HEADERS *.h)
+ADD_FILES(HEADERS dispatch.h
+                  diagnostics.h
+                  modbus.h
+                  interface.h
+                  hotplug.h)
+
+ADD_FILES(SOURCES modbus.c
+                  diagnostics.c
+                  interface.c
+                  dispatch.c                                                                          
+                  hotplug.c)
+
+ADD_SUBDIRECTORY(aduformat)
+ADD_SUBDIRECTORY(fcodes)
+
+
+MESSAGE(${SOURCES})
+MESSAGE(${HEADERS})
 
 ADD_PLATFORM_LIBRARY(modbus STATIC "ds ucdm time hal-uc-usb" ${SOURCES})
 
