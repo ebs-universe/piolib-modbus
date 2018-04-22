@@ -23,6 +23,7 @@ Docstring for modbus
 """
 
 import pytest
+import logging
 
 try:
     from ebs.modbus.client import ModbusClient
@@ -34,6 +35,10 @@ except ImportError:
 
 SLAVE_NREGS = 64
 TEST_ADDRESS_BASE = 14
+
+logging.basicConfig()
+log = logging.getLogger()
+log.setLevel(logging.INFO)
 
 
 @pytest.fixture
