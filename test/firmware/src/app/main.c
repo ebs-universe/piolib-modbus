@@ -1,15 +1,13 @@
 
 #include "application.h"
 #include "application_descriptors.h"
+#include <platform/cpu.h>
 #include "bsp/hal/uc.h"
 #include "bsp/drivers/led/led.h"
 #include "sys/sys.h"
-
 #include "sys/modbus/modbus.h"
 
 #include "test_modbus.h"
-
-volatile uint8_t rval=0;
 
 
 static void deferred_exec(void);
