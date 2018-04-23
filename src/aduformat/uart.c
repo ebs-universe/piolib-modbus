@@ -35,6 +35,7 @@
 #include "../interface.h"
 #include "../diagnostics.h"
 #include "uart.h"
+#include "crc.h"
 
 
 const modbus_aduformat_t modbus_aduformat_uart = {
@@ -44,7 +45,6 @@ const modbus_aduformat_t modbus_aduformat_uart = {
     &modbus_uart_adu_validate,
     &modbus_uart_adu_write,
 };
-
 
 uint8_t modbus_uart_adu_validate(void){
     //Get Address included in message

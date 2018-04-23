@@ -5,6 +5,7 @@
 #include "dispatch.h"
 #include <ds/sllist.h>
 #include <ucdm/ucdm.h>
+#include "aduformat/crc.h"
 #include "aduformat/uart.h"
 #include "fcodes/common.h"
 #include <string.h>
@@ -83,7 +84,8 @@ void modbus_hotplug_check(void){
         uint16_t wa = (uint16_t)rbyte[mbt->aduformat->prefix_n + 1] | (rbyte[mbt->aduformat->prefix_n + 2]);
         if (wa != _mb_tr_addr) goto next_transport;
         
-        // If the crc is incorrect, move on
+        // If the crc is incorrect, move on. 
+        // TODO CRC calculation should be ADU format dependent
         uint16_t crc = modbus_calculate_crc(&(rbyte[0]), (len - 2));
         uint16_t apu_crc = (rbyte[len-2]) | ((uint16_t)(rbyte[len-1])<<8);
         if (crc != apu_crc) goto next_transport;

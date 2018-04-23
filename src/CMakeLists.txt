@@ -57,6 +57,7 @@ FALLBACK_DEFAULT(MB_SUPPORT_FC_EIT              "1")
 FALLBACK_DEFAULT(MB_SUPPORT_SFC_EIT_CANOPEN     "0")
 FALLBACK_DEFAULT(MB_SUPPORT_SFC_EIT_RDDEVID     "1")
 FALLBACK_DEFAULT(MB_SUPPORT_FC_DIAGNOSTICS      "1")
+FALLBACK_DEFAULT(USE_ASM_IF_AVAILABLE           1)
 
 INCLUDE(ebs/lib-conf)
 
@@ -70,8 +71,7 @@ ADD_FILES(SOURCES modbus.c
                   diagnostics.c
                   interface.c
                   dispatch.c                                                                          
-                  hotplug.c
-                  crc.c)
+                  hotplug.c)
 
 ADD_SUBDIRECTORY(aduformat)
 ADD_SUBDIRECTORY(fcodes)
