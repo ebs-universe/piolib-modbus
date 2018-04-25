@@ -38,10 +38,10 @@ from pymodbus.file_message import WriteFileRecordResponse
 from pymodbus.file_message import ReadFifoQueueResponse
 from pymodbus.other_message import ReadExceptionStatusResponse
 from pymodbus.other_message import GetCommEventCounterResponse
-from pymodbus.other_message import GetCommEventLogResponse
 from pymodbus.other_message import ReportSlaveIdResponse
 
 from .mei import ReadEBSDeviceInformationResponse
+from .events import EBSGetCommEventLogResponse
 
 
 class EBSClientDecoder(IModbusDecoder):
@@ -60,7 +60,7 @@ class EBSClientDecoder(IModbusDecoder):
 
             ReadExceptionStatusResponse,
             GetCommEventCounterResponse,
-            GetCommEventLogResponse,
+            EBSGetCommEventLogResponse,
             ReportSlaveIdResponse,
 
             ReadFileRecordResponse,
