@@ -106,10 +106,18 @@
     #define MODBUS_FRAME_UNSUPPORTED        1
 #endif
 
+#ifndef MODBUS_EVENTLOG_LENGTH
+    #define MODBUS_EVENTLOG_LENGTH          @MODBUS_EVENTLOG_LENGTH@
+#endif
+
 /**
  * @name Modbus Function Groups Support Inclusion
  */
 /**@{*/
+#ifndef MB_DIAGNOSTICS
+    #define MB_DIAGNOSTICS                  @MB_DIAGNOSTICS@
+#endif
+
 #ifndef MB_SUPPORT_BITFUNCS            
     #define MB_SUPPORT_BITFUNCS             @MB_SUPPORT_BITFUNCS@
 #endif
@@ -125,6 +133,11 @@
 #ifndef MB_SUPPORT_CELOGFUNCS            
     #define MB_SUPPORT_CELOGFUNCS           @MB_SUPPORT_CELOGFUNCS@
 #endif
+
+#ifndef MB_SUPPORT_EITFUNCS
+    #define MB_SUPPORT_EITFUNCS             @MB_SUPPORT_EITFUNCS@
+#endif
+
 /**@}*/
 
 /**

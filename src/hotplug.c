@@ -3,12 +3,14 @@
 #include "modbus.h"
 #include "hotplug.h"
 #include "dispatch.h"
-#include <ds/sllist.h>
-#include <ucdm/ucdm.h>
+#include "diagnostics.h"
 #include "aduformat/crc.h"
 #include "aduformat/uart.h"
 #include "fcodes/common.h"
+
 #include <string.h>
+#include <ds/sllist.h>
+#include <ucdm/ucdm.h>
 
 
 #if MODBUS_PLUGGABLE_TRANSPORTS == 1
@@ -37,6 +39,9 @@ uint8_t modbus_switch_transport(uint8_t tag){
     if (mbt == NULL){
         return 1;
     }
+    #ifdef MB_DIAGNOSTICS
+    modbus_append_event(MODBUS_HOTPLUG_EVENT_SIG | (tag & ~MODBUS_HOTPLUG_EVENT_MASK));
+    #endif
     ucdm_register[_mb_tr_addr].data = (uint16_t)tag;
     modbus_sm.aduformat = mbt->aduformat;
     modbus_sm.intfnum = mbt->intfnum;

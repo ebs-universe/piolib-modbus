@@ -55,11 +55,16 @@ uint8_t modbus_uart_adu_validate(void){
     uint16_t crc = modbus_calculate_crc(&(modbus_rxtxbuf[0]), (modbus_sm.rxtxlen-2));
     
     if (apu_crc != crc){
+        #if MB_DIAGNOSTICS
         modbus_bus_comm_err_cnt ++;
+        modbus_log_received(1<<1);
+        #endif
         return 0;
     }
     
+    #if MB_DIAGNOSTICS
     modbus_bus_msg_cnt ++;
+    #endif
     
     if (!apu_addr){
         modbus_ctrans.broadcast = MODBUS_CTT_BROADCAST;
@@ -68,10 +73,10 @@ uint8_t modbus_uart_adu_validate(void){
         modbus_ctrans.broadcast = MODBUS_CTT_UNICAST;
     }
     else{
+        // Not addressed to us
         return 0;
     }
     
-    modbus_server_msg_cnt ++;
     return 1;
 }
 

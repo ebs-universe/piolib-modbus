@@ -181,7 +181,6 @@ void modbus_reset_all(void);
 
 void modbus_state_machine(void);
 uint8_t modbus_process_command(void);
-extern uint16_t modbus_bus_char_overrun_cnt;
 
 /**@}*/ 
 

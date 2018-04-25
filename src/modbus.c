@@ -109,11 +109,11 @@ static inline uint16_t _modbus_init_interface(uint16_t ucdm_next_address,
 }
 
 uint16_t modbus_init(uint16_t ucdm_next_address, uint16_t tmodbus_address){
+    modbus_init_diagnostics();
     #if MODBUS_PLUGGABLE_TRANSPORTS == 1 
     modbus_init_ptransports(ucdm_next_address + 1);
     #endif
     _modbus_init_interface(ucdm_next_address, tmodbus_address);
-    modbus_init_diagnostics();
     modbus_reset_all();
     #if MODBUS_USE_TIMEOUTS
     tm_register_epoch_change_handler(&_mbtimeout_epochchange_handler);
@@ -222,7 +222,12 @@ void modbus_state_machine(void){
         case MODBUS_ST_PROCESS:
             modbus_process_command();
             if (modbus_ctrans.broadcast || !(modbus_sm.rxtxlen)){
+                #if MB_DIAGNOSTICS
                 modbus_server_noresp_cnt ++;
+                if (modbus_ctrans.broadcast){
+                    modbus_log_received(1<<6);
+                }
+                #endif
                 modbus_reset_sm();
             }
             else{
@@ -241,11 +246,19 @@ void modbus_state_machine(void){
 }
 
 uint8_t modbus_process_command(void){
+    #if MB_DIAGNOSTICS
+    modbus_log_received(0x00);
+    #endif
     if (modbus_sm.silent && (modbus_ctrans.fcode != MB_FC_DIAGNOSTICS)){
         modbus_sm.rxtxlen = 0;
         return 0;
     }
     modbus_ctrans.fcode_handler->handler();
+    #if MB_DIAGNOSTICS
+    if (modbus_rxtxbuf[modbus_sm.aduformat->prefix_n] < 0x80){
+        modbus_log_sent(0x00);
+    }
     modbus_server_msg_cnt ++;
+    #endif
     return 1;
 }
