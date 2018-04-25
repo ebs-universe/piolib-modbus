@@ -43,7 +43,7 @@ log.setLevel(logging.INFO)
 
 @pytest.fixture
 def client(request):
-    mclient = ModbusClient(method='rtu', timeout=0.1, **request.param)
+    mclient = ModbusClient(method='rtu', timeout=0.3, **request.param)
     mclient.connect()
 
     # Claim interface via hotplug
