@@ -149,10 +149,10 @@ void modbus_handler_gtcelog(void){
         *(wp++) = (llen + 6);
     }
     
-    *(wp++) = 0x00;
-    *(wp++) = 0x00;
     *(wp++) = (uint8_t)(modbus_comm_event_cnt >> 8);
     *(wp++) = (uint8_t)(modbus_comm_event_cnt);
+    *(wp++) = (uint8_t)(modbus_bus_msg_cnt >> 8);
+    *(wp++) = (uint8_t)(modbus_bus_msg_cnt);
     
     if (modbus_ctrans.fcode == MB_FC_GT_CECNT){
         modbus_sm.rxtxlen = modbus_sm.aduformat->prefix_n + 5;

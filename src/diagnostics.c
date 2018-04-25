@@ -54,6 +54,7 @@ uint16_t modbus_server_msg_cnt;
 uint16_t modbus_server_noresp_cnt;
 uint16_t modbus_server_nak_cnt;
 uint16_t modbus_server_busy_cnt;
+uint16_t modbus_comm_event_cnt;
 
 /**@}*/ 
 
@@ -62,7 +63,6 @@ uint16_t modbus_server_busy_cnt;
  */
 /**@{*/ 
 
-uint16_t modbus_comm_event_cnt;
 uint8_t modbus_comm_event_log_buf[MODBUS_EVENTLOG_LENGTH + 1];
 bytebuf modbus_comm_event_log;
 
