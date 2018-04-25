@@ -61,17 +61,24 @@
     */
     /**@{*/ 
     #define APP_ENABLE_MODBUS               1
+    #define APP_MODBUS_TRANSPORT            MODBUS_USBCDC
+    
+    #define MODBUS_USE_TIMEOUTS             1
+    #define MODBUS_EVENTLOG_LENGTH          128
+    
     #define MODBUS_PLUGGABLE_TRANSPORTS     1
     #define MODBUS_ENABLE_TRANSPORT_UART    1
     #define MODBUS_TRANSPORT_UART_INTFNUM   1
     #define MODBUS_ENABLE_TRANSPORT_USBCDC  1
     #define MODBUS_TRANSPORT_USBCDC_INTFNUM 1
-    #define APP_MODBUS_TRANSPORT            MODBUS_USBCDC
+    
+    #define MB_DIAGNOSTICS                  1
     #define MB_SUPPORT_BITFUNCS             1
     #define MB_SUPPORT_REGFUNCS             1
     #define MB_SUPPORT_FILEFUNCS            1
+    #define MB_SUPPORT_EITFUNCS             1
     #define MB_SUPPORT_CELOGFUNCS           1
-    #define MODBUS_USE_TIMEOUTS             1
+    
     /**@}*/ 
 /**@}*/ 
 
