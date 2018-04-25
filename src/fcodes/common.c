@@ -42,10 +42,33 @@ void modbus_handler_notimpl(void){
 
 
 void modbus_build_exc_response(uint8_t ecode){
-    modbus_bus_exception_cnt ++;
+    #if MB_DIAGNOSTICS
+        modbus_bus_exception_cnt ++;
+        #if MB_SUPPORT_CELOGFUNCS
+        uint8_t event=0x00;
+        switch(ecode){
+            case 0x01:
+            case 0x02:
+            case 0x03:
+                event = 1<<0;
+                break;
+            case 0x04:
+                event = 1<<1;
+                break;
+            case 0x05:
+            case 0x06:
+                event = 1<<2;
+                break;
+            case 0x07:
+                event = 1<<3;
+        }
+        modbus_log_sent(event);
+        #endif
+    #endif
     if (modbus_ctrans.broadcast){
         return;
     }
+    #if MB_DIAGNOSTICS
     switch(ecode){
         case 0x07:
             modbus_server_nak_cnt ++;
@@ -54,9 +77,10 @@ void modbus_build_exc_response(uint8_t ecode){
             modbus_server_busy_cnt ++;
             break;
     }
+    #endif
     modbus_rxtxbuf[modbus_sm.aduformat->prefix_n] += 0x80;
     modbus_rxtxbuf[modbus_sm.aduformat->prefix_n + 1] = ecode;
-    modbus_sm.rxtxlen = modbus_sm.aduformat->prefix_n + 2;;
+    modbus_sm.rxtxlen = modbus_sm.aduformat->prefix_n + 2;
     modbus_sm.aduformat->pack();
     return;
 }

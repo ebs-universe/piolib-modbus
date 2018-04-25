@@ -70,12 +70,19 @@ void modbus_handler_diagnostics(void){
         case MB_SFC_DAIG_FORCELISTEN:
             modbus_sm.silent = MODBUS_OUT_SILENT;
             modbus_sm.rxtxlen = 0;
+            #if MB_SUPPORT_CELOGFUNCS
+            modbus_append_event(0x04);
+            #endif
             return;
         case MB_SFC_DAIG_RESTCOMM:
             if MODBUS_RBYTE(3){
                 // Clear Event Log
                 modbus_clear_eventlog();
             }
+            #if MB_SUPPORT_CELOGFUNCS
+            modbus_append_event(0x00);
+            #endif
+            modbus_comm_event_cnt = 0;
             if(modbus_sm.silent){
                 modbus_clear_counters();
                 modbus_sm.silent = MODBUS_OUT_NORMAL;
@@ -156,6 +163,8 @@ void modbus_handler_gtcelog(void){
     *(wp++) = 0x00;
     *(wp++) = llen;
     bytebuf_cCopyLen(&modbus_comm_event_log, wp, llen);
+    modbus_sm.rxtxlen = modbus_sm.aduformat->prefix_n + 2 + 6 + llen;
+    modbus_sm.aduformat->pack();
     return;
 }
 

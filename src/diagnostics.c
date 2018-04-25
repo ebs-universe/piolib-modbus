@@ -30,14 +30,16 @@
  */
 
 
-
-#include<ucdm/ucdm.h>
+#include "config.h"
+#include <ucdm/ucdm.h>
 #include "diagnostics.h"
+#include "modbus.h"
 
 
 uint16_t *const modbus_diagnostic_register_p =  &ucdm_diagnostic_register;
 uint8_t  *const modbus_exception_status_p =     &ucdm_exception_status;
 
+#if MB_DIAGNOSTICS
 
 /**
  * @name Diagnostic Counters
@@ -61,11 +63,10 @@ uint16_t modbus_server_busy_cnt;
 /**@{*/ 
 
 uint16_t modbus_comm_event_cnt;
-uint8_t modbus_comm_event_log_buf[64];
+uint8_t modbus_comm_event_log_buf[MODBUS_EVENTLOG_LENGTH + 1];
 bytebuf modbus_comm_event_log;
 
 /**@}*/ 
-
 
 void modbus_clear_eventlog(void){
     bytebuf_vFlush(&modbus_comm_event_log);
@@ -80,6 +81,7 @@ void modbus_clear_counters(void){
     modbus_server_noresp_cnt = 0;
     modbus_server_nak_cnt = 0;
     modbus_server_busy_cnt = 0;
+    modbus_comm_event_cnt = 0;
 }
 
 void modbus_clear_diagnostics(void){
@@ -89,7 +91,9 @@ void modbus_clear_diagnostics(void){
 }
 
 void modbus_init_eventlog(void){
-    bytebuf_vInit(modbus_comm_event_log_buf, 64, &modbus_comm_event_log);
+    bytebuf_vInit(modbus_comm_event_log_buf, 
+                  MODBUS_EVENTLOG_LENGTH, 
+                  &modbus_comm_event_log);
     modbus_clear_eventlog();
 }
 
@@ -97,3 +101,61 @@ void modbus_init_diagnostics(void){
     modbus_init_eventlog();
     modbus_clear_counters();
 }
+
+#else
+void modbus_clear_eventlog(void){
+    ;
+}
+void modbus_clear_counters(void){
+    ;
+}
+void modbus_clear_diagnostics(void){
+    ;
+}
+void modbus_init_eventlog(void){
+    ;
+}    
+void modbus_init_diagnostics(void){
+    ;
+}
+#endif
+
+#if MB_SUPPORT_CELOGFUNCS
+void modbus_append_event(uint8_t event){
+    while(!bytebuf_cPushReqLock(&modbus_comm_event_log, 1, 0x01)){
+        bytebuf_cPopByte(&modbus_comm_event_log);
+    }
+    bytebuf_cPushByte(&modbus_comm_event_log, event, 0x01);
+}
+
+void modbus_log_received(uint8_t event){
+    event |= (1<<7);
+    if (modbus_sm.silent){
+        event |= (1<<5);
+    }
+    if (modbus_bus_char_overrun_cnt){
+        // TODO Does this make sense per event?
+        event |= (1<<4);
+    }
+    modbus_append_event(event);
+}
+
+void modbus_log_sent(uint8_t event){
+    event |= (1<<6);
+    if (modbus_sm.silent){
+        event |= (1<<5);
+    }
+    modbus_append_event(event);
+}
+
+#else
+void modbus_append_event(uint8_t __attribute__((unused)) event){
+    ;
+}
+void modbus_log_received(uint8_t __attribute__((unused)) event){
+    ;
+}
+void modbus_log_sent(uint8_t __attribute__((unused)) event){
+    ;
+}
+#endif
