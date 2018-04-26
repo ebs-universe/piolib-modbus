@@ -144,10 +144,10 @@ typedef struct MODBUS_CTRANS_t{
 
 typedef struct MODBUS_TRANSPORT_t{
     struct MODBUS_TRANSPORT_t * next;
-    uint8_t tag;
+    const uint8_t tag;
+    const uint8_t intfnum;
     const pluggable_transport_t * const transport;
     const modbus_aduformat_t * const aduformat;
-    const uint8_t intfnum;
 }modbus_transport_t;
 
 extern uint16_t * modbus_address_p;

@@ -21,12 +21,12 @@ uint16_t _mb_tr_addr;
 
 #if MODBUS_ENABLE_TRANSPORT_UART == 1
 modbus_transport_t modbus_transport_uart = {NULL, MODBUS_TRANSPORT_TAG_UART, 
-    &ptransport_uart, &modbus_aduformat_uart, MODBUS_TRANSPORT_UART_INTFNUM};
+     MODBUS_TRANSPORT_UART_INTFNUM, &ptransport_uart, &modbus_aduformat_uart};
 #endif
     
 #if MODBUS_ENABLE_TRANSPORT_USBCDC == 1
 modbus_transport_t modbus_transport_usbcdc = {NULL, MODBUS_TRANSPORT_TAG_USBCDC, 
-    &ptransport_usbcdc, &modbus_aduformat_uart, MODBUS_TRANSPORT_USBCDC_INTFNUM};
+    MODBUS_TRANSPORT_USBCDC_INTFNUM, &ptransport_usbcdc, &modbus_aduformat_uart};
 #endif
 
 void modbus_install_transport(modbus_transport_t * mbtransport){

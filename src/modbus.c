@@ -32,7 +32,6 @@
 
 #include <ucdm/ucdm.h>
 #include <ucdm/descriptor.h>
-#include <time/time.h>
 
 #include "modbus.h"
 #include "dispatch.h"
@@ -50,9 +49,25 @@ modbus_ctrans_t modbus_ctrans;
 uint8_t modbus_rxtxbuf[MODBUS_ADU_MAXLEN];
 
 #if MODBUS_USE_TIMEOUTS
-    tm_system_t modbus_next_timeout;
-    void _mbtimeout_change_handler(tm_sdelta_t * offset);
-    tm_epochchange_handler_t _mbtimeout_epochchange_handler = {NULL, 3, &_mbtimeout_change_handler};
+    #include <time/cron.h>
+    cron_job_t modbus_timeout = {{0, 0}, 0, NULL, NULL, NULL, &modbus_reset_sm};
+    
+    static inline void _mbtimeout_set(uint8_t seconds){
+        tm_current_time(&(modbus_timeout.texec));
+        modbus_timeout.texec.seconds += seconds;
+        tm_cron_replace_job(&modbus_timeout);
+    }
+
+    static inline void _mbtimeout_clear(void){
+        tm_cron_cancel_job(&modbus_timeout);
+    }
+#else 
+    static inline void _mbtimeout_set(uint8_t seconds){
+        ;    
+    }
+    static inline void _mbtimeout_clear(void){
+        ;
+    }
 #endif
 
 modbus_sm_t modbus_sm = {
@@ -115,46 +130,8 @@ uint16_t modbus_init(uint16_t ucdm_next_address, uint16_t tmodbus_address){
     #endif
     _modbus_init_interface(ucdm_next_address, tmodbus_address);
     modbus_reset_all();
-    #if MODBUS_USE_TIMEOUTS
-    tm_register_epoch_change_handler(&_mbtimeout_epochchange_handler);
-    #endif
     return ucdm_next_address + 2;
 }
-
-#if MODBUS_USE_TIMEOUTS
-static inline void _mbtimeout_set(uint8_t seconds){
-    tm_current_time(&modbus_next_timeout);
-    modbus_next_timeout.seconds += seconds;
-}
-
-static inline void _mbtimeout_clear(void){
-    tm_clear_stime(&modbus_next_timeout);
-}
-
-static inline uint8_t _mbtimeout_check(void){
-    if (tm_cmp_stime(&tm_current, &modbus_next_timeout) == 1){
-        return 1;
-    }
-    else{
-        return 0;
-    }
-}
-
-void _mbtimeout_change_handler(tm_sdelta_t * offset){
-    tm_apply_sdelta(&modbus_next_timeout, offset);
-}
-#else 
-static inline void _mbtimeout_set(uint8_t seconds){
-    ;    
-}
-static inline void _mbtimeout_clear(void){
-    ;
-}
-static inline uint8_t _mbtimeout_check(void){
-    return 0;
-}
-#endif
-
 
 // MODBUS State Machine Implementation
 void modbus_state_machine(void){
@@ -201,9 +178,6 @@ void modbus_state_machine(void){
                     modbus_if_read(&(modbus_rxtxbuf[modbus_sm.rxtxlen]), tvar8);
                     modbus_sm.rxtxlen += tvar8;
                 }
-                else{
-                    if (_mbtimeout_check()) modbus_reset_sm();
-                }
             }
             else{
                 _mbtimeout_clear();
@@ -236,9 +210,11 @@ void modbus_state_machine(void){
             break;
         case MODBUS_ST_SEND:
             if (modbus_sm.rxtxlen){
+                _mbtimeout_set(1);
                 modbus_sm.aduformat->write();
             }
             else{
+                _mbtimeout_clear();
                 modbus_reset_sm();
             }
             break;
