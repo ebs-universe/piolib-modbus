@@ -36,11 +36,6 @@
 // and reduce overall code foofprint. This will, however, deepen the worst case 
 // call stack.
 
-// NOTE 
-// UCDM expects uint8_t register addresses. Leave that cast to the very 
-// last step to simplify conversion later on, if / when UCDM is moved to 
-// uint16_t addresses.
-
 void modbus_handler_rdregs(void)
 {
     uint8_t n = MODBUS_RBYTE(4);

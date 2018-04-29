@@ -155,6 +155,7 @@ void modbus_state_machine(void){
             if (modbus_if_unhandled_rxb() >= tvar8){
                 _mbtimeout_set(1);
                 modbus_if_read(&(modbus_rxtxbuf[0]), tvar8);
+                // TODO Check if it is another slave responding here instead
                 modbus_sm.rxtxlen = tvar8;
                 modbus_ctrans.fcode = modbus_rxtxbuf[tvar8-1];
                 modbus_ctrans.fcode_handler = modbus_get_fcode_handler(modbus_ctrans.fcode);
@@ -190,6 +191,7 @@ void modbus_state_machine(void){
             }
             else{
                 // CRC Failed / Command not for us.
+                // TODO Prepare to handle another slave's response here instead
                 modbus_reset_sm();
             }
             break;
