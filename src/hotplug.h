@@ -36,11 +36,11 @@
 #define MODBUS_HOTPLUG_EVENT_SIG    0x08
 
 #if MODBUS_ENABLE_TRANSPORT_USBCDC
-    #include "bsp/hal/uc/usbcdc.h"
+    #include "hal/uc/usbcdc.h"
     #define MODBUS_TRANSPORT_TAG_USBCDC     2
 #endif
 #if MODBUS_ENABLE_TRANSPORT_UART
-    #include "bsp/hal/uc/uart.h"
+    #include "hal/uc/uart.h"
     #define MODBUS_TRANSPORT_TAG_UART       1
 #endif
 

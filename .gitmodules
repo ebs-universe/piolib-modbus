@@ -1,4 +1,0 @@
-[submodule "test/firmware/src/bsp"]
-	path = test/firmware/src/bsp
-	url = git@github.com:chintal/ebs-bsp-msp430-lpf5529.git
-
