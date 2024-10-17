@@ -77,37 +77,41 @@
 #include <platform/transport.h>
 #include "config.h"
 #include "fcodes/common.h"
+#include <ucdm/ucdm.h>
 
 /**
  * @name Modbus State Machine State Variable States
  */
 /**@{*/ 
-#define MODBUS_ST_PREINIT       0
-#define MODBUS_ST_IDLE          1
-#define MODBUS_ST_RECV          2
-#define MODBUS_ST_VERIFY        3
-#define MODBUS_ST_PROCESS       4
-#define MODBUS_ST_SEND          5
+typedef enum{
+    MODBUS_ST_PREINIT,       
+    MODBUS_ST_IDLE,
+    MODBUS_ST_RECV,
+    MODBUS_ST_VERIFY,
+    MODBUS_ST_PROCESS,
+    MODBUS_ST_SEND
+} MODBUS_STATE_t;
 /**@}*/ 
 
 /**
  * @name Modbus State Machine Silence States
  */
 /**@{*/ 
-#define MODBUS_OUT_NORMAL       0
-#define MODBUS_OUT_SILENT       1
+typedef enum{
+    MODBUS_OUT_NORMAL,
+    MODBUS_OUT_SILENT
+} MODBUS_SILENCE_t;
 /**@}*/ 
 
 /**
  * @name Modbus Current Transaction Types
  */
-/**@{*/ 
-#define MODBUS_CTT_UNICAST      0
-#define MODBUS_CTT_BROADCAST    1
+/**@{*/
+typedef enum{
+    MODBUS_CTT_UNICAST   = 0,
+    MODBUS_CTT_BROADCAST = 1
+}MODBUS_CTT_t;
 /**@}*/ 
-
-#define UCDM_OFS_MB_TRANSPORT   1
-
 
 /**
  * @name Modbus Internal Containers and Types
@@ -119,7 +123,7 @@ typedef struct MODBUS_ADUFORMAT_t{
     const uint8_t prefix_n;
     const uint8_t postfix_n;
     void (*const pack)(void);
-    uint8_t (*const validate)(void);
+    HAL_BASE_t (*const validate)(void);
     void (*const write)(void);
 }modbus_aduformat_t;
 
@@ -129,15 +133,15 @@ typedef struct MODBUS_SM_t{
     const pluggable_transport_t * transport;
     uint8_t intfnum;
 #endif 
-    uint8_t state;
-    uint8_t silent;
+    MODBUS_STATE_t state;
+    MODBUS_SILENCE_t silent;
     uint8_t rxtxlen;
     uint8_t const* rxtxbuf;
     uint8_t * txp;
 }modbus_sm_t;
 
 typedef struct MODBUS_CTRANS_t{
-    uint8_t broadcast;
+    MODBUS_CTT_t broadcast;
     uint8_t fcode;
     const modbus_fcode_handler_t * fcode_handler;
 }modbus_ctrans_t;
@@ -150,10 +154,14 @@ typedef struct MODBUS_TRANSPORT_t{
     const modbus_aduformat_t * const aduformat;
 }modbus_transport_t;
 
-extern uint16_t * modbus_address_p;
-extern modbus_sm_t modbus_sm;
+typedef struct MODBUS_CONTROL_t{
+    uint8_t address;
+    uint8_t options;
+}modbus_control_t;
+
+extern modbus_control_t modbus_control;
+extern modbus_sm_t modbus_sm; 
 extern modbus_ctrans_t modbus_ctrans;
-extern const modbus_aduformat_t modbus_aduformat;
 extern uint8_t modbus_rxtxbuf[MODBUS_ADU_MAXLEN];
 
 /**@}*/ 
@@ -163,13 +171,11 @@ extern uint8_t modbus_rxtxbuf[MODBUS_ADU_MAXLEN];
  * 
  */
 /**@{*/ 
-
-uint16_t modbus_init(uint16_t ucdm_next_address, uint16_t tmodbus_address);
+ucdm_addr_t modbus_init(ucdm_addr_t ucdm_next_address, uint8_t tmodbus_address);
 void modbus_install_descriptor(void);
-void modbus_set_address(uint16_t tmodbus_address);
+void modbus_set_address(uint8_t address);
 void modbus_reset_sm(void);
 void modbus_reset_all(void);
-
 /**@}*/ 
 
 
@@ -178,10 +184,8 @@ void modbus_reset_all(void);
  * 
  */
 /**@{*/ 
-
 void modbus_state_machine(void);
 uint8_t modbus_process_command(void);
-
 /**@}*/ 
 
 /**

@@ -32,25 +32,6 @@
 #include "bits.h"
 
 
-void modbus_handler_wrsbit(void)
-{
-    uint16_t addrb = MODBUS_RWORD(1, 2);
-    uint8_t val = MODBUS_RBYTE(3);
-    uint8_t res;
-    
-    if (val){
-        res = ucdm_set_bit(addrb);
-    }
-    else{
-        res = ucdm_clear_bit(addrb);
-    }
-    if (res){
-        modbus_build_exc_response(0x02);
-        return;
-    }
-    return;
-}
-
 void modbus_handler_rdbits(void)
 {
     uint16_t addrb = MODBUS_RWORD(1, 2);
@@ -62,7 +43,7 @@ void modbus_handler_rdbits(void)
         modbus_build_exc_response(0x03);
         return;
     }
-    if (addrb + len > DMAP_MAXBITS){
+    if (addrb + len > UCDM_MAX_BITS){
         modbus_build_exc_response(0x02);
         return;
     }
@@ -96,6 +77,25 @@ void modbus_handler_rdbits(void)
     return;
 }
 
+void modbus_handler_wrsbit(void)
+{
+    uint16_t addrb = MODBUS_RWORD(1, 2);
+    uint8_t val = MODBUS_RBYTE(3);
+    uint8_t res;
+    
+    if (val){
+        res = ucdm_set_bit(addrb);
+    }
+    else{
+        res = ucdm_clear_bit(addrb);
+    }
+    if (res){
+        modbus_build_exc_response(0x02);
+        return;
+    }
+    return;
+}
+
 void modbus_handler_wrbits(void)
 {
     uint16_t addrb = MODBUS_RWORD(1, 2);
@@ -108,7 +108,7 @@ void modbus_handler_wrbits(void)
         modbus_build_exc_response(0x03);
         return;
     }
-    if (addrb + len > DMAP_MAXBITS){
+    if (addrb + len > UCDM_MAX_BITS){
         modbus_build_exc_response(0x02);
         return;
     }

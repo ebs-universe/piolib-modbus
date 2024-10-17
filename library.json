@@ -1,0 +1,34 @@
+{
+    "name": "ebs-modbus",
+    "version": "0.1.0",
+    "description": "Transport Agnostic Modbus State Machine Implementation for Embedded Systems",
+    "keywords": ["ebs", "modbus"],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ebs-universe/piolib-modbus"
+    },
+    "authors": {
+        "name": "Chintalagiri Shashank",
+        "email": "shashank.chintalagiri@gmail.com",
+        "url": "https://github.com/chintal",
+        "maintainer": true
+    },
+    "license": "LGPL-3.0-or-later",
+    "homepage": "https://ebs-universe.github.io/piolib-modbus",
+    "frameworks": "*",
+    "platforms": "*",
+    "dependencies": [
+        { 
+            "owner": "chintal",
+            "name": "ebs-ds"
+        },
+        { 
+            "owner": "chintal",
+            "name": "ebs-ucdm"
+        },
+        { 
+            "owner": "chintal",
+            "name": "ebs-time"
+        }
+    ]
+  }

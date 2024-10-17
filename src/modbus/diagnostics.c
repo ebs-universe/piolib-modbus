@@ -45,7 +45,6 @@ uint8_t  *const modbus_exception_status_p =     &ucdm_exception_status;
  * @name Diagnostic Counters
  */
 /**@{*/ 
-
 uint16_t modbus_bus_msg_cnt;
 uint16_t modbus_bus_comm_err_cnt;
 uint16_t modbus_bus_exception_cnt;
@@ -55,6 +54,10 @@ uint16_t modbus_server_noresp_cnt;
 uint16_t modbus_server_nak_cnt;
 uint16_t modbus_server_busy_cnt;
 uint16_t modbus_comm_event_cnt;
+
+// Overrun counter is contained within the uart_if state now. We need to 
+// get modbus to read from there instead or find some other. For the moment,
+// modbus_bus_char_overrun_cnt is incorrect. 
 
 /**@}*/ 
 

@@ -45,16 +45,23 @@
 #include "hotplug.h"
 #endif
 
+modbus_sm_t modbus_sm;
 modbus_ctrans_t modbus_ctrans;
 uint8_t modbus_rxtxbuf[MODBUS_ADU_MAXLEN];
 
 #if MODBUS_USE_TIMEOUTS
     #include <time/cron.h>
-    cron_job_t modbus_timeout = {{0, 0}, 0, NULL, NULL, NULL, &modbus_reset_sm};
+    cron_job_t modbus_timeout = {
+        .texec = 0, 
+        .active = 0,
+        .tafter_p = NULL, 
+        .nextjob = NULL,
+        .prevjob = NULL,
+        .handler = &modbus_reset_sm};
     
-    static inline void _mbtimeout_set(uint8_t seconds){
+    static inline void _mbtimeout_set(uint16_t millis){
         tm_current_time(&(modbus_timeout.texec));
-        modbus_timeout.texec.seconds += seconds;
+        modbus_timeout.texec += millis;
         tm_cron_replace_job(&modbus_timeout);
     }
 
@@ -77,7 +84,7 @@ modbus_sm_t modbus_sm = {
     #if MODBUS_PLUGGABLE_TRANSPORTS == 1
         NULL, 
         0,
-    #endif 
+    #endif
         MODBUS_ST_PREINIT,
         MODBUS_OUT_NORMAL,
         0,
@@ -85,7 +92,7 @@ modbus_sm_t modbus_sm = {
         &modbus_rxtxbuf[0],
 };
 
-uint16_t * modbus_address_p;
+modbus_control_t modbus_control;
 
 /** @brief Modbus Library Version Descriptor */
 static descriptor_custom_t modbus_descriptor = {NULL, 
@@ -108,29 +115,30 @@ void modbus_reset_all(void){
     modbus_reset_sm();
 }
 
-void modbus_set_address(uint16_t tmodbus_address){
-    *modbus_address_p = tmodbus_address;
+void modbus_set_address(uint8_t address){
+    modbus_control.address = address;
 }
 
-static inline uint16_t _modbus_init_interface(uint16_t ucdm_next_address, 
-                                              uint16_t tmodbus_address);
+static inline ucdm_addr_t _modbus_init_interface(ucdm_addr_t ucdm_next_address, 
+                                                 uint8_t tmodbus_address);
 
-static inline uint16_t _modbus_init_interface(uint16_t ucdm_next_address, 
-                                              uint16_t tmodbus_address){
+static inline ucdm_addr_t _modbus_init_interface(ucdm_addr_t ucdm_next_address, 
+                                              uint8_t tmodbus_address){
     modbus_if_init();
-    modbus_address_p = &(ucdm_register[ucdm_next_address].data);
+    ucdm_redirect_regr_ptr(ucdm_next_address, (uint16_t *)&modbus_control);
+    ucdm_redirect_regw_ptr(ucdm_next_address, (uint16_t *)&modbus_control);
     modbus_set_address(tmodbus_address);
     return (ucdm_next_address + 1);
 }
 
-uint16_t modbus_init(uint16_t ucdm_next_address, uint16_t tmodbus_address){
+ucdm_addr_t modbus_init(ucdm_addr_t ucdm_next_address, uint8_t tmodbus_address){
     modbus_init_diagnostics();
     #if MODBUS_PLUGGABLE_TRANSPORTS == 1 
     modbus_init_ptransports(ucdm_next_address + 1);
     #endif
-    _modbus_init_interface(ucdm_next_address, tmodbus_address);
+    ucdm_next_address = _modbus_init_interface(ucdm_next_address, tmodbus_address);
     modbus_reset_all();
-    return ucdm_next_address + 2;
+    return ucdm_next_address;
 }
 
 // MODBUS State Machine Implementation

@@ -46,7 +46,7 @@ const modbus_aduformat_t modbus_aduformat_uart = {
     &modbus_uart_adu_write,
 };
 
-uint8_t modbus_uart_adu_validate(void){
+HAL_BASE_t modbus_uart_adu_validate(void){
     //Get Address included in message
     uint8_t apu_addr = modbus_rxtxbuf[0];
     //Get CRC included in message
@@ -69,7 +69,7 @@ uint8_t modbus_uart_adu_validate(void){
     if (!apu_addr){
         modbus_ctrans.broadcast = MODBUS_CTT_BROADCAST;
     }
-    else if(apu_addr == *modbus_address_p){
+    else if(apu_addr == modbus_control.address){
         modbus_ctrans.broadcast = MODBUS_CTT_UNICAST;
     }
     else{

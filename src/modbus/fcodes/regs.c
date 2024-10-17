@@ -43,7 +43,7 @@ void modbus_handler_rdregs(void)
     uint16_t tvar;
     uint8_t * wp;
     
-    if ((saddr + n >= DMAP_MAXREGS)){    
+    if ((saddr + n >= UCDM_MAX_REGISTERS)){    
         modbus_build_exc_response(0x02);
         return;
     }
@@ -93,7 +93,7 @@ void modbus_handler_wrregs(void)
     uint8_t rval;
     uint8_t scount = 0;
     
-    if (saddr + n >= DMAP_MAXREGS){    
+    if (saddr + n >= UCDM_MAX_REGISTERS){    
         // WARNING If some / all of the registers are not writeable, 
         // an exception is not returned. This is unavoidable because
         // errors would show up only after some of the registers have 
@@ -130,7 +130,7 @@ void modbus_handler_wrregm(void)
     uint16_t tvar;
     uint8_t res;
     
-    if (addr >= DMAP_MAXREGS){    
+    if (addr >= UCDM_MAX_REGISTERS){    
         modbus_build_exc_response(0x02);
         return;
     }
@@ -155,7 +155,7 @@ void modbus_handler_rwmregs(void)
     uint8_t * ap;
     uint16_t tvar;
     
-    if ((rsaddr + nr > DMAP_MAXREGS) || (wsaddr + nr > DMAP_MAXREGS)){
+    if ((rsaddr + nr > UCDM_MAX_REGISTERS) || (wsaddr + nr > UCDM_MAX_REGISTERS)){
         modbus_build_exc_response(0x02);
         return;
     }

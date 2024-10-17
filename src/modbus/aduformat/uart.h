@@ -53,7 +53,7 @@ extern const modbus_aduformat_t modbus_aduformat_uart;
   * recieves 1, it should then call modbus_process_command() so that the 
   * library can handle the message.
   */
-uint8_t modbus_uart_adu_validate(void);
+HAL_BASE_t modbus_uart_adu_validate(void);
 void modbus_uart_adu_pack(void);
 void modbus_uart_adu_write(void);
 
