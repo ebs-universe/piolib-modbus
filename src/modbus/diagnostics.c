@@ -32,6 +32,7 @@
 
 #include "config.h"
 #include <ucdm/ucdm.h>
+#include <ds/bytebuf.h>
 #include "diagnostics.h"
 #include "modbus.h"
 

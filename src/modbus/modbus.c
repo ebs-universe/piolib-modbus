@@ -138,6 +138,11 @@ ucdm_addr_t modbus_init(ucdm_addr_t ucdm_next_address, uint8_t tmodbus_address){
     #endif
     ucdm_next_address = _modbus_init_interface(ucdm_next_address, tmodbus_address);
     modbus_reset_all();
+
+    #if MODBUS_LIBVERSION_DESCRIPTOR
+    modbus_install_descriptor();
+    #endif
+
     return ucdm_next_address;
 }
 
